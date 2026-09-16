@@ -49,7 +49,7 @@
 #include "ChineseStrings.h" // TR::* UTF-8 hex-escaped strings
 #include "Overlay.h"
 
-bool g_trChinese = true; // UI language: true = Chinese (default), false = English
+bool g_trChinese = false; // UI language: true = Chinese, false = English (default)
 #include "BuildBypass.h"
 
 // ----------------------------------------------------------------------------
@@ -1476,7 +1476,7 @@ void DrawTrainerUI()
 // UI language detection. LocaleManager::getInstance()->(field 0x78) holds the
 // active LocaleInfo*; LocaleInfo: id @0x8, name (wstring) @0x30, steamCode @0x58.
 // Chinese when id/steamCode says zh/cn/chinese, or the locale name has CJK
-// chars. Defaults to Chinese (the original UI language) on any failure.
+// chars. Defaults to English on any failure/miss.
 // ----------------------------------------------------------------------------
 
 static bool IsChineseLocaleId(const char* id, const char* sc, const wchar_t* nm);
@@ -1490,18 +1490,18 @@ static bool DetectChineseUI()
     {
         LocaleManager* lm = LocaleManager::getInstance();
         if (!lm)
-            return true;
+            return false;
         LocaleInfo* cur = *(LocaleInfo**)((char*)lm + 0x78);
         if (!cur)
-            return true;
+            return false;
         id = ((const std::string*)((char*)cur + 0x8))->c_str();
         nm = ((const std::wstring*)((char*)cur + 0x30))->c_str();
         sc = ((const std::string*)((char*)cur + 0x58))->c_str();
     }
-    __except (EXCEPTION_EXECUTE_HANDLER) { return true; }
+    __except (EXCEPTION_EXECUTE_HANDLER) { return false; }
 
     if (!id)
-        return true;
+        return false;
     return IsChineseLocaleId(id, sc, nm);
 }
 
@@ -1520,7 +1520,7 @@ static bool IsChineseLocaleId(const char* id, const char* sc, const wchar_t* nm)
             if (*p2 >= 0x4E00 && *p2 <= 0x9FFF)
                 return true;
     }
-    return true; // unknown locale: keep the original Chinese UI
+    return false; // unknown locale: default to English
 }
 
 __declspec(dllexport) void startPlugin()
