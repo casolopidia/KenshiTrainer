@@ -45,8 +45,14 @@ void BuildBypass_Set(bool enabled)
 
 void BuildBypass_Install()
 {
+    // placementVerification is VIRTUAL: &Class::placementVerification makes the
+    // compiler synthesize a local vtable-dispatch thunk, so GetRealAddress gets
+    // an address in our own module and asserts (Functions.cpp:174). The _NV_
+    // variant is a plain non-virtual import stub for the same RVA (0x4DCAC0);
+    // with LTCG enabled its address folds to the KenshiLib import. Same x64
+    // calling convention: rcx = this, bool returned in al.
     if (KenshiLib::SUCCESS != KenshiLib::AddHook(
-            KenshiLib::GetRealAddress(&PreviewBuilding::placementVerification),
+            KenshiLib::GetRealAddress(&PreviewBuilding::_NV_placementVerification),
             &PlacementVerification_Hook, &g_origPlacementVerification))
         DebugLog("KenshiTrainer: placementVerification hook FAILED");
     else
