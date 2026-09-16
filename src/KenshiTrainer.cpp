@@ -835,8 +835,6 @@ static Item* CreateConfiguredItem(GameData* gd)
 
 // ----------------------------------------------------------------------------
 // UI state + actions
-// ----------------------------------------------------------------------------
-
 static bool        g_showMenu = false;
 static std::string g_status;
 static int         g_qty = 1;
@@ -866,7 +864,541 @@ static void DrawBuildTab()
     ImGui::TextUnformatted(TR::HINT_BUILD_BYPASS);
 }
 
+
+// ---------------------------------------------------------------------------
+// Stat write path calibration. getStatRef RVAs may not line up on every build;
+// instead of trusting header offsets blindly, we write unique marker values
+// through getStatRef once and scan CharStats memory for where they landed.
+// That gives the true per-stat storage offsets on THIS game build.
+// ---------------------------------------------------------------------------
+
+static int  g_statOffsets[64];       // stat index -> byte offset in CharStats, -1 = unmapped
+static bool InitStatOffsets()
+{
+    for (int i = 0; i < 64; ++i) g_statOffsets[i] = -1;
+    return true;
+}
+static bool g_offsetsInit = InitStatOffsets();
+static bool g_calibrated = false;
+static bool g_calibFailed = false;
+
+static float ReadCharStatsFloat(CharStats* st, int off)
+{
+    __try { return *(float*)((char*)st + off); }
+    __except (EXCEPTION_EXECUTE_HANDLER) { return -12345.0f; }
+}
+
+static void CalibrateStatsImpl()
+{
+    Character* c = GetSelectedCharacter();
+    if (!c || !c->stats)
+    {
+        g_calibFailed = true;
+        return;
+    }
+    CharStats* st = c->stats;
+    float orig[64];
+    for (int i = 0; i < TR_STATS_COUNT; ++i)
+        orig[i] = SafeGetStat(st, TR_STATS[i].id);
+
+    // write unique markers through the official API
+    for (int i = 0; i < TR_STATS_COUNT; ++i)
+        SafeSetStat(st, TR_STATS[i].id, 10000.0f + (float)i);
+
+    // scan CharStats [0x80, 0x140) for the markers
+    int found = 0;
+    for (int o = 0x80; o < 0x140; o += 4)
+    {
+        float v = ReadCharStatsFloat(st, o);
+        if (v >= 10000.0f && v < 10000.0f + 64.0f)
+        {
+            int idx = (int)(v - 10000.0f);
+            if (idx >= 0 && idx < TR_STATS_COUNT)
+            {
+                g_statOffsets[idx] = o;
+                found++;
+            }
+        }
+    }
+
+    // restore originals no matter what
+    for (int i = 0; i < TR_STATS_COUNT; ++i)
+        SafeSetStat(st, TR_STATS[i].id, orig[i]);
+
+    g_calibrated = true;
+    char buf[128];
+    sprintf_s(buf, "KenshiTrainer: stat calibration found %d/%d offsets", found, TR_STATS_COUNT);
+    DebugLog(buf);
+    for (int i = 0; i < TR_STATS_COUNT; ++i)
+    {
+        char b2[96];
+        sprintf_s(b2, "  stat[%d] %s -> offset 0x%X", i, TR_STATS[i].name, g_statOffsets[i]);
+        DebugLog(b2);
+    }
+}
+
+static void CalibrateStats()
+{
+    __try { CalibrateStatsImpl(); }
+    __except (EXCEPTION_EXECUTE_HANDLER) { g_calibFailed = true; ErrorLog("KenshiTrainer: calibration crashed"); }
+}
+
+// fast stat access: direct offset when calibrated, getStatRef/getStat otherwise
+static float ReadStatFast(CharStats* st, int i)
+{
+    if (g_statOffsets[i] > 0)
+        return ReadCharStatsFloat(st, g_statOffsets[i]);
+    return SafeGetStat(st, TR_STATS[i].id);
+}
+
+static bool WriteStatFastImpl(CharStats* st, int off, float v)
+{
+    __try { *(float*)((char*)st + off) = v; return true; }
+    __except (EXCEPTION_EXECUTE_HANDLER) { return false; }
+}
+
+static bool WriteStatFast(CharStats* st, int i, float v)
+{
+    if (g_statOffsets[i] > 0)
+        return WriteStatFastImpl(st, g_statOffsets[i], v);
+    return SafeSetStat(st, TR_STATS[i].id, v);
+}
+
+static void RefreshStatsData()
+{
+    Character* c = GetSelectedCharacter();
+    for (int i = 0; i < TR_STATS_COUNT; ++i)
+        g_statVals[i] = (c && c->stats) ? ReadStatFast(c->stats, i) : 0.0f;
+    if (c)
+    {
+        std::string n;
+        if (SafeGetName(c, &n))
+            strncpy_s(g_nameBuf, n.c_str(), 127);
+    }
+    int m = SafeGetMoney();
+    if (m >= 0)
+        g_moneyVal = m;
+    g_statsDirty = false;
+}
+
+static void ApplyStat(int i)
+{
+    Character* c = GetSelectedCharacter();
+    if (!c || !c->stats)
+    {
+        SetStatus(TR::MSG_NO_CHAR);
+        return;
+    }
+    float v = g_statVals[i];
+    if (v < 0.0f) v = 0.0f;
+    if (v > 100000.0f) v = 100000.0f;
+    if (WriteStatFast(c->stats, i, v))
+    {
+        float readback = ReadStatFast(c->stats, i); // verify what stuck
+        char buf[200];
+        sprintf_s(buf, "%s [%s = %.0f] (readback %.0f)", TR::MSG_STAT_SET, TR_STATS[i].name, v, readback);
+        SetStatus(buf);
+    }
+    else
+        SetStatus(TR::MSG_STAT_FAIL);
+}
+
+static void DoRename()
+{
+    Character* c = GetSelectedCharacter();
+    if (!c || !g_nameBuf[0])
+        return;
+    std::string name = g_nameBuf;
+    if (SafeSetName(c, &name))
+    {
+        g_statsDirty = true;
+        SetStatus(std::string(TR::MSG_RENAME_OK) + name);
+    }
+    else
+        SetStatus(TR::MSG_STAT_FAIL);
+}
+
+static void DoSetMoney()
+{
+    if (g_moneyVal < 0)
+    {
+        SetStatus(TR::MSG_BAD_VALUE);
+        return;
+    }
+    if (SafeSetMoney(g_moneyVal))
+    {
+        char buf[64];
+        sprintf_s(buf, "%s%d", TR::MSG_MONEY_OK, g_moneyVal);
+        SetStatus(buf);
+    }
+    else
+        SetStatus(TR::MSG_STAT_FAIL);
+}
+
+static void DoMaxAll()
+{
+    Character* c = GetSelectedCharacter();
+    if (!c || !c->stats)
+    {
+        SetStatus(TR::MSG_NO_CHAR);
+        return;
+    }
+    for (int i = 0; i < TR_STATS_COUNT; ++i)
+        WriteStatFast(c->stats, i, 100.0f);
+    g_statsDirty = true;
+    SetStatus(TR::MSG_ALL_MAXED);
+}
+
+static void DoSpawn()
+{
+    Character* c = GetSelectedCharacter();
+    if (!c)
+    {
+        SetStatus(TR::MSG_NO_CHAR);
+        return;
+    }
+    GameData* gd = g_selItem;
+    if (!gd)
+    {
+        SetStatus(TR::MSG_NO_ITEM);
+        return;
+    }
+    int qty = g_qty > 0 ? (g_qty > 999 ? 999 : g_qty) : 1;
+
+    Item* item = CreateConfiguredItem(gd);
+    if (!item)
+    {
+        SetStatus(std::string(TR::MSG_SPAWN_FAIL) + ": " + gd->name);
+        return;
+    }
+    Inventory* inv = c->getInventory();
+    if (!inv)
+    {
+        SetStatus(TR::MSG_SPAWN_FAIL);
+        return;
+    }
+
+    // read back the actual quality info so the user can verify the result
+    std::string mName, matName;
+    int lvl = -1;
+    SafeGetQualityInfo(item, &mName, &matName, &lvl);
+
+    char buf[300];
+    if (SafeAddItem(inv, item, qty))
+    {
+        std::string extra;
+        if (!mName.empty() || !matName.empty() || lvl >= 0)
+        {
+            char eb[220];
+            sprintf_s(eb, " [manufacturer=%s material=%s lv=%d]",
+                mName.c_str(), matName.c_str(), lvl);
+            extra = eb;
+        }
+        sprintf_s(buf, "%s%s x%d%s", TR::MSG_SPAWN_OK, gd->name.c_str(), qty, extra.c_str());
+    }
+    else
+    {
+        sprintf_s(buf, "%s (%s)", TR::MSG_INV_FULL, gd->name.c_str());
+    }
+    SetStatus(buf);
+}
+
+// ----------------------------------------------------------------------------
+// ImGui UI
+// ----------------------------------------------------------------------------
+
+static void DrawStatsTab()
+{
+    Character* c = GetSelectedCharacter();
+    if (g_statsDirty)
+    {
+        if (!g_calibrated && !g_calibFailed && GetSelectedCharacter())
+            CalibrateStats();
+        RefreshStatsData();
+    }
+
+    ImGui::TextUnformatted(TR::LBL_CHARACTER);
+    ImGui::SameLine();
+    {
+        std::string cn;
+        if (c && SafeGetName(c, &cn))
+            ImGui::TextUnformatted(cn.c_str());
+        else
+            ImGui::TextUnformatted(TR::NO_CHARACTER);
+    }
+
+    // name + money row
+    ImGui::PushItemWidth(200.0f);
+    ImGui::InputText(TR::LBL_NAME, g_nameBuf, sizeof(g_nameBuf));
+    ImGui::PopItemWidth();
+    ImGui::SameLine();
+    if (ImGui::Button(TR::BTN_RENAME))
+        DoRename();
+    ImGui::SameLine();
+    ImGui::PushItemWidth(130.0f);
+    ImGui::InputInt(TR::LBL_MONEY, &g_moneyVal, 0, 0);
+    ImGui::PopItemWidth();
+    ImGui::SameLine();
+    if (ImGui::Button((std::string(TR::BTN_SET) + "##money").c_str()))
+        DoSetMoney();
+
+    if (ImGui::Button(TR::BTN_REFRESH))
+        g_statsDirty = true;
+    ImGui::SameLine();
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.65f, 0.40f, 0.15f, 0.9f));
+    if (ImGui::Button(TR::BTN_MAX_ALL))
+        DoMaxAll();
+    ImGui::PopStyleColor();
+    if (!c)
+        ImGui::TextColored(ImVec4(1, 0.6f, 0.3f, 1), TR::MSG_NO_CHAR);
+
+    ImGui::Separator();
+    ImGui::BeginChild("##statslist", ImVec2(0, 0), false);
+    for (int i = 0; i < TR_STATS_COUNT; ++i)
+    {
+        ImGui::PushID(i);
+        ImGui::TextUnformatted(TR_STATS[i].name);
+        ImGui::SameLine(200.0f);
+        ImGui::SetNextItemWidth(130.0f);
+        // text edit only; the game is written EXCLUSIVELY by the set button:
+        // typing, Enter or clicking away must never apply anything
+        ImGui::InputText("##val", g_statEdit[i], sizeof(g_statEdit[i]),
+            ImGuiInputTextFlags_CharsDecimal);
+        ImGui::SameLine();
+        if (ImGui::SmallButton(TR::BTN_SET))
+        {
+            if (g_statEdit[i][0] == 0)
+                SetStatus(TR::MSG_BAD_VALUE);
+            else
+            {
+                float v = (float)atof(g_statEdit[i]);
+                g_statVals[i] = v;
+                ApplyStat(i);
+                sprintf_s(g_statEdit[i], "%.0f", g_statVals[i]);
+            }
+        }
+        ImGui::PopID();
+    }
+    ImGui::EndChild();
+}
+
+static void GameDataCombo(const char* id, const char* label,
+    const std::vector<GameData*>& items, int* sel, bool enabled)
+{
+    if (!enabled)
+        return;
+    ImGui::TextUnformatted(label);
+    ImGui::SameLine();
+    const char* preview = TR::OPT_AUTO;
+    if (*sel > 0 && *sel <= (int)items.size())
+        preview = items[*sel - 1]->name.c_str();
+    ImGui::SetNextItemWidth(-1.0f);
+    if (ImGui::BeginCombo(id, preview))
+    {
+        if (ImGui::Selectable(TR::OPT_AUTO, *sel == 0))
+            *sel = 0;
+        for (size_t i = 0; i < items.size(); ++i)
+        {
+            ImGui::PushID((int)i);
+            if (ImGui::Selectable(items[i]->name.c_str(), *sel == (int)i + 1))
+                *sel = (int)i + 1;
+            ImGui::PopID();
+        }
+        ImGui::EndCombo();
+    }
+}
+
+// grade -> level mapping. Armour has 6 real tiers spread over the 0..100
+// scale (-1 = auto). Weapons: 0 = game default (CheatMenu documents its grade
+// field as "0 - Default, 1 - 100"), 20..100 = mid-grade..meitou.
+static const char* const A_GRADE_NAMES[6] = { TR::QL_0, TR::QL_1, TR::QL_2, TR::QL_3, TR::QL_4, TR::QL_5 };
+static const int         A_GRADE_LEVELS[6] = { 5, 20, 40, 60, 80, 95 };
+static const char* const W_GRADE_NAMES[5] = { TR::WQL_MID, TR::WQL_REFIT, TR::WQL_CATUN2, TR::WQL_MK3, TR::WQL_MEITOU };
+static const int         W_GRADE_LEVELS[5] = { 20, 40, 60, 80, 100 };
+
+// quality combo driven by the numeric level: shows auto when level == autoVal,
+// the matching grade name when it equals a grade level, custom otherwise.
+// Picking an entry writes the mapped level (still editable via the input box).
+static void GradeCombo(const char* id, const char* label, int* level, int autoVal,
+    const char* const* names, int n, const int* levels)
+{
+    const char* preview = TR::OPT_AUTO;
+    if (*level != autoVal)
+    {
+        preview = TR::QL_CUSTOM;
+        for (int q = 0; q < n; ++q)
+            if (*level == levels[q]) { preview = names[q]; break; }
+    }
+    ImGui::TextUnformatted(label);
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(-1.0f);
+    if (ImGui::BeginCombo(id, preview))
+    {
+        if (ImGui::Selectable(TR::OPT_AUTO, *level == autoVal))
+            *level = autoVal;
+        for (int q = 0; q < n; ++q)
+            if (ImGui::Selectable(names[q], *level == levels[q]))
+                *level = levels[q];
+        ImGui::EndCombo();
+    }
+}
+
+// a weapon model's inherent level field is build/data-dependent; try the
+// common int/float keys. The one-shot dumps above log the real key set.
+static bool FindModelLevel(GameData* m, int* out)
+{
+    if (!m)
+        return false;
+    static const char* ki[] = { "level", "grade", "quality", "min level", "minlevel", "tier", NULL };
+    for (int i = 0; ki[i]; ++i)
+    {
+        std::string k(ki[i]);
+        if (SafeGetIData(m, &k, out))
+            return true;
+    }
+    static const char* kf[] = { "level", NULL };
+    for (int i = 0; kf[i]; ++i)
+    {
+        std::string k(kf[i]);
+        float f = 0.0f;
+        if (SafeGetFData(m, &k, &f)) { *out = (int)f; return true; }
+    }
+    return false;
+}
+
+static void DrawItemsTab()
+{
+    if (g_itemsCache.empty())
+        RebuildItemCache();
+    if (g_visibleItems.empty() && g_searchBuf[0] == 0)
+        RefreshVisibleItems("");
+
+    // search + category
+    ImGui::PushItemWidth(220.0f);
+    if (ImGui::InputText(TR::LBL_SEARCH, g_searchBuf, sizeof(g_searchBuf)))
+    {
+        std::string f = ToLower(g_searchBuf);
+        RefreshVisibleItems(f.c_str());
+    }
+    ImGui::PopItemWidth();
+    ImGui::SameLine();
+    static const char* catNames[6] = {
+        TR::CAT_ALL, TR::CAT_WEAPON, TR::CAT_ARMOUR,
+        TR::CAT_ITEM, TR::CAT_CROSSBOW, TR::CAT_CONTAINER
+    };
+    ImGui::SetNextItemWidth(130.0f);
+    if (ImGui::BeginCombo("##cat", catNames[g_curCat]))
+    {
+        for (int i = 0; i < 6; ++i)
+        {
+            if (ImGui::Selectable(catNames[i], g_curCat == i))
+            {
+                g_curCat = i;
+                RebuildItemCache();
+                std::string f = ToLower(g_searchBuf);
+                RefreshVisibleItems(f.c_str());
+                SelectItem(NULL);
+            }
+        }
+        ImGui::EndCombo();
+    }
+    ImGui::SameLine();
+    ImGui::Text("%s%d", TR::MSG_ITEMS_LOADED, (int)g_itemsCache.size());
+
+    ImGui::Separator();
+
+    ImGui::BeginChild("##itemlist", ImVec2(ImGui::GetContentRegionAvail().x * 0.55f, 0), true);
+    ImGuiListClipper clipper;
+    clipper.Begin((int)g_visibleItems.size());
+    while (clipper.Step())
+    {
+        for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; ++i)
+        {
+            GameData* gd = g_visibleItems[i];
+            ImGui::PushID(i);
+            bool sel = (gd == g_selItem);
+            if (ImGui::Selectable(gd->name.c_str(), sel))
+                SelectItem(gd);
+            if (sel && ImGui::IsItemHovered() &&
+                ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+                DoSpawn();
+            ImGui::PopID();
+        }
+    }
+    ImGui::EndChild();
+
+    ImGui::SameLine();
+    ImGui::BeginChild("##itemopts", ImVec2(0, 0), true);
+
+    int t = g_selItem ? SafeDataType(g_selItem) : -1;
+    bool weaponLike = (t == WEAPON);
+    bool armourLike = (t == ARMOUR);
+    bool crossbowLike = (t == CROSSBOW);
+
+    // explicit model pick -> prefill the weapon level from the model's own
+    // level data when it has one (user can still edit it; 0 = game default)
+    static int prevVariant = -2;
+    if (g_selVariant != prevVariant)
+    {
+        prevVariant = g_selVariant;
+        if (weaponLike && g_selVariant > 0)
+        {
+            int lv = -1;
+            if (FindModelLevel(CurrentVariant(), &lv))
+                g_weaponLevel = lv < 0 ? 0 : (lv > 100 ? 100 : lv);
+        }
+    }
+
+    GameDataCombo("##company", TR::LBL_MANUFACTURER, g_companies, &g_selCompany, weaponLike);
+    GameDataCombo("##model", TR::LBL_MODEL, g_variants, &g_selVariant, weaponLike);
+
+    if (weaponLike)
+    {
+        GradeCombo("##wgrade", TR::LBL_QUALITY, &g_weaponLevel, 0,
+            W_GRADE_NAMES, 5, W_GRADE_LEVELS);
+        ImGui::TextUnformatted(TR::LBL_LEVEL_W);
+        ImGui::SameLine();
+        ImGui::PushItemWidth(110.0f);
+        ImGui::InputInt("##wlevel", &g_weaponLevel, 1, 10);
+        ImGui::PopItemWidth();
+        if (g_weaponLevel < 0) g_weaponLevel = 0;
+        if (g_weaponLevel > 100) g_weaponLevel = 100;
+    }
+
+    if (armourLike || crossbowLike)
+    {
+        GradeCombo("##grade", TR::LBL_QUALITY, &g_gearLevel, -1,
+            A_GRADE_NAMES, 6, A_GRADE_LEVELS);
+        ImGui::TextUnformatted(TR::LBL_LEVEL_A);
+        ImGui::SameLine();
+        ImGui::PushItemWidth(110.0f);
+        ImGui::InputInt("##glevel", &g_gearLevel, 1, 10);
+        ImGui::PopItemWidth();
+        if (g_gearLevel < -1) g_gearLevel = -1;
+        if (g_gearLevel > 100) g_gearLevel = 100;
+    }
+
+    ImGui::PushItemWidth(90.0f);
+    ImGui::InputInt(TR::LBL_COUNT, &g_qty, 1, 10);
+    ImGui::PopItemWidth();
+    if (g_qty < 1) g_qty = 1;
+    if (g_qty > 999) g_qty = 999;
+
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.20f, 0.55f, 0.30f, 0.95f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.28f, 0.70f, 0.40f, 1.0f));
+    if (ImGui::Button(TR::BTN_SPAWN, ImVec2(-1.0f, 0)))
+        DoSpawn();
+    ImGui::PopStyleColor(2);
+    ImGui::TextWrapped("%s", TR::BTN_DRAG_HINT);
+    ImGui::EndChild();
+}
+
 bool Trainer_MenuOpen() { return g_showMenu; }
+
+// ----------------------------------------------------------------------------
+// Trainer UI
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 void DrawTrainerUI()
 {

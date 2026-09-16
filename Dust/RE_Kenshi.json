@@ -1,4 +1,0 @@
-{
-    "PreloadPlugins": ["DustBoot.dll"],
-    "Plugins": ["Dust.dll"]
-}
