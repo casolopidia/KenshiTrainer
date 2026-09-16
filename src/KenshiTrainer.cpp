@@ -26,6 +26,7 @@
 #include <kenshi/util/hand.h>
 #include <kenshi/util/lektor.h>
 #include <kenshi/InputHandler.h>
+#include <kenshi/LocaleInfo.h>
 #include <kenshi/Platoon.h>
 
 #define WIN32_LEAN_AND_MEAN
@@ -47,6 +48,8 @@
 #include "StatNames.h"      // TR_STATS (needs Enums.h first)
 #include "ChineseStrings.h" // TR::* UTF-8 hex-escaped strings
 #include "Overlay.h"
+
+bool g_trChinese = true; // UI language: true = Chinese (default), false = English
 #include "BuildBypass.h"
 
 // ----------------------------------------------------------------------------
@@ -856,12 +859,12 @@ static void SetStatus(const std::string& msg)
 static void DrawBuildTab()
 {
     bool bypass = BuildBypass_Enabled();
-    if (ImGui::Checkbox(TR::LBL_BUILD_BYPASS, &bypass))
+    if (ImGui::Checkbox(TR(LBL_BUILD_BYPASS), &bypass))
     {
         BuildBypass_Set(bypass);
-        g_status = TR::LBL_BUILD_BYPASS;
+        g_status = TR(LBL_BUILD_BYPASS);
     }
-    ImGui::TextUnformatted(TR::HINT_BUILD_BYPASS);
+    ImGui::TextUnformatted(TR(HINT_BUILD_BYPASS));
 }
 
 
@@ -932,7 +935,7 @@ static void CalibrateStatsImpl()
     for (int i = 0; i < TR_STATS_COUNT; ++i)
     {
         char b2[96];
-        sprintf_s(b2, "  stat[%d] %s -> offset 0x%X", i, TR_STATS[i].name, g_statOffsets[i]);
+        sprintf_s(b2, "  stat[%d] %s -> offset 0x%X", i, TR_STAT(i), g_statOffsets[i]);
         DebugLog(b2);
     }
 }
@@ -968,7 +971,10 @@ static void RefreshStatsData()
 {
     Character* c = GetSelectedCharacter();
     for (int i = 0; i < TR_STATS_COUNT; ++i)
+    {
         g_statVals[i] = (c && c->stats) ? ReadStatFast(c->stats, i) : 0.0f;
+        sprintf_s(g_statEdit[i], "%.0f", g_statVals[i]);
+    }
     if (c)
     {
         std::string n;
@@ -986,7 +992,7 @@ static void ApplyStat(int i)
     Character* c = GetSelectedCharacter();
     if (!c || !c->stats)
     {
-        SetStatus(TR::MSG_NO_CHAR);
+        SetStatus(TR(MSG_NO_CHAR));
         return;
     }
     float v = g_statVals[i];
@@ -996,11 +1002,11 @@ static void ApplyStat(int i)
     {
         float readback = ReadStatFast(c->stats, i); // verify what stuck
         char buf[200];
-        sprintf_s(buf, "%s [%s = %.0f] (readback %.0f)", TR::MSG_STAT_SET, TR_STATS[i].name, v, readback);
+        sprintf_s(buf, "%s [%s = %.0f] (readback %.0f)", TR(MSG_STAT_SET), TR_STAT(i), v, readback);
         SetStatus(buf);
     }
     else
-        SetStatus(TR::MSG_STAT_FAIL);
+        SetStatus(TR(MSG_STAT_FAIL));
 }
 
 static void DoRename()
@@ -1012,27 +1018,27 @@ static void DoRename()
     if (SafeSetName(c, &name))
     {
         g_statsDirty = true;
-        SetStatus(std::string(TR::MSG_RENAME_OK) + name);
+        SetStatus(std::string(TR(MSG_RENAME_OK)) + name);
     }
     else
-        SetStatus(TR::MSG_STAT_FAIL);
+        SetStatus(TR(MSG_STAT_FAIL));
 }
 
 static void DoSetMoney()
 {
     if (g_moneyVal < 0)
     {
-        SetStatus(TR::MSG_BAD_VALUE);
+        SetStatus(TR(MSG_BAD_VALUE));
         return;
     }
     if (SafeSetMoney(g_moneyVal))
     {
         char buf[64];
-        sprintf_s(buf, "%s%d", TR::MSG_MONEY_OK, g_moneyVal);
+        sprintf_s(buf, "%s%d", TR(MSG_MONEY_OK), g_moneyVal);
         SetStatus(buf);
     }
     else
-        SetStatus(TR::MSG_STAT_FAIL);
+        SetStatus(TR(MSG_STAT_FAIL));
 }
 
 static void DoMaxAll()
@@ -1040,13 +1046,13 @@ static void DoMaxAll()
     Character* c = GetSelectedCharacter();
     if (!c || !c->stats)
     {
-        SetStatus(TR::MSG_NO_CHAR);
+        SetStatus(TR(MSG_NO_CHAR));
         return;
     }
     for (int i = 0; i < TR_STATS_COUNT; ++i)
         WriteStatFast(c->stats, i, 100.0f);
     g_statsDirty = true;
-    SetStatus(TR::MSG_ALL_MAXED);
+    SetStatus(TR(MSG_ALL_MAXED));
 }
 
 static void DoSpawn()
@@ -1054,13 +1060,13 @@ static void DoSpawn()
     Character* c = GetSelectedCharacter();
     if (!c)
     {
-        SetStatus(TR::MSG_NO_CHAR);
+        SetStatus(TR(MSG_NO_CHAR));
         return;
     }
     GameData* gd = g_selItem;
     if (!gd)
     {
-        SetStatus(TR::MSG_NO_ITEM);
+        SetStatus(TR(MSG_NO_ITEM));
         return;
     }
     int qty = g_qty > 0 ? (g_qty > 999 ? 999 : g_qty) : 1;
@@ -1068,13 +1074,13 @@ static void DoSpawn()
     Item* item = CreateConfiguredItem(gd);
     if (!item)
     {
-        SetStatus(std::string(TR::MSG_SPAWN_FAIL) + ": " + gd->name);
+        SetStatus(std::string(TR(MSG_SPAWN_FAIL)) + ": " + gd->name);
         return;
     }
     Inventory* inv = c->getInventory();
     if (!inv)
     {
-        SetStatus(TR::MSG_SPAWN_FAIL);
+        SetStatus(TR(MSG_SPAWN_FAIL));
         return;
     }
 
@@ -1094,11 +1100,11 @@ static void DoSpawn()
                 mName.c_str(), matName.c_str(), lvl);
             extra = eb;
         }
-        sprintf_s(buf, "%s%s x%d%s", TR::MSG_SPAWN_OK, gd->name.c_str(), qty, extra.c_str());
+        sprintf_s(buf, "%s%s x%d%s", TR(MSG_SPAWN_OK), gd->name.c_str(), qty, extra.c_str());
     }
     else
     {
-        sprintf_s(buf, "%s (%s)", TR::MSG_INV_FULL, gd->name.c_str());
+        sprintf_s(buf, "%s (%s)", TR(MSG_INV_FULL), gd->name.c_str());
     }
     SetStatus(buf);
 }
@@ -1117,47 +1123,47 @@ static void DrawStatsTab()
         RefreshStatsData();
     }
 
-    ImGui::TextUnformatted(TR::LBL_CHARACTER);
+    ImGui::TextUnformatted(TR(LBL_CHARACTER));
     ImGui::SameLine();
     {
         std::string cn;
         if (c && SafeGetName(c, &cn))
             ImGui::TextUnformatted(cn.c_str());
         else
-            ImGui::TextUnformatted(TR::NO_CHARACTER);
+            ImGui::TextUnformatted(TR(NO_CHARACTER));
     }
 
     // name + money row
     ImGui::PushItemWidth(200.0f);
-    ImGui::InputText(TR::LBL_NAME, g_nameBuf, sizeof(g_nameBuf));
+    ImGui::InputText(TR(LBL_NAME), g_nameBuf, sizeof(g_nameBuf));
     ImGui::PopItemWidth();
     ImGui::SameLine();
-    if (ImGui::Button(TR::BTN_RENAME))
+    if (ImGui::Button(TR(BTN_RENAME)))
         DoRename();
     ImGui::SameLine();
     ImGui::PushItemWidth(130.0f);
-    ImGui::InputInt(TR::LBL_MONEY, &g_moneyVal, 0, 0);
+    ImGui::InputInt(TR(LBL_MONEY), &g_moneyVal, 0, 0);
     ImGui::PopItemWidth();
     ImGui::SameLine();
-    if (ImGui::Button((std::string(TR::BTN_SET) + "##money").c_str()))
+    if (ImGui::Button((std::string(TR(BTN_SET)) + "##money").c_str()))
         DoSetMoney();
 
-    if (ImGui::Button(TR::BTN_REFRESH))
+    if (ImGui::Button(TR(BTN_REFRESH)))
         g_statsDirty = true;
     ImGui::SameLine();
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.65f, 0.40f, 0.15f, 0.9f));
-    if (ImGui::Button(TR::BTN_MAX_ALL))
+    if (ImGui::Button(TR(BTN_MAX_ALL)))
         DoMaxAll();
     ImGui::PopStyleColor();
     if (!c)
-        ImGui::TextColored(ImVec4(1, 0.6f, 0.3f, 1), TR::MSG_NO_CHAR);
+        ImGui::TextColored(ImVec4(1, 0.6f, 0.3f, 1), TR(MSG_NO_CHAR));
 
     ImGui::Separator();
     ImGui::BeginChild("##statslist", ImVec2(0, 0), false);
     for (int i = 0; i < TR_STATS_COUNT; ++i)
     {
         ImGui::PushID(i);
-        ImGui::TextUnformatted(TR_STATS[i].name);
+        ImGui::TextUnformatted(TR_STAT(i));
         ImGui::SameLine(200.0f);
         ImGui::SetNextItemWidth(130.0f);
         // text edit only; the game is written EXCLUSIVELY by the set button:
@@ -1165,10 +1171,10 @@ static void DrawStatsTab()
         ImGui::InputText("##val", g_statEdit[i], sizeof(g_statEdit[i]),
             ImGuiInputTextFlags_CharsDecimal);
         ImGui::SameLine();
-        if (ImGui::SmallButton(TR::BTN_SET))
+        if (ImGui::SmallButton(TR(BTN_SET)))
         {
             if (g_statEdit[i][0] == 0)
-                SetStatus(TR::MSG_BAD_VALUE);
+                SetStatus(TR(MSG_BAD_VALUE));
             else
             {
                 float v = (float)atof(g_statEdit[i]);
@@ -1189,13 +1195,13 @@ static void GameDataCombo(const char* id, const char* label,
         return;
     ImGui::TextUnformatted(label);
     ImGui::SameLine();
-    const char* preview = TR::OPT_AUTO;
+    const char* preview = TR(OPT_AUTO);
     if (*sel > 0 && *sel <= (int)items.size())
         preview = items[*sel - 1]->name.c_str();
     ImGui::SetNextItemWidth(-1.0f);
     if (ImGui::BeginCombo(id, preview))
     {
-        if (ImGui::Selectable(TR::OPT_AUTO, *sel == 0))
+        if (ImGui::Selectable(TR(OPT_AUTO), *sel == 0))
             *sel = 0;
         for (size_t i = 0; i < items.size(); ++i)
         {
@@ -1211,9 +1217,9 @@ static void GameDataCombo(const char* id, const char* label,
 // grade -> level mapping. Armour has 6 real tiers spread over the 0..100
 // scale (-1 = auto). Weapons: 0 = game default (CheatMenu documents its grade
 // field as "0 - Default, 1 - 100"), 20..100 = mid-grade..meitou.
-static const char* const A_GRADE_NAMES[6] = { TR::QL_0, TR::QL_1, TR::QL_2, TR::QL_3, TR::QL_4, TR::QL_5 };
+static const char* const A_GRADE_NAMES[6] = { TR(QL_0), TR(QL_1), TR(QL_2), TR(QL_3), TR(QL_4), TR(QL_5) };
 static const int         A_GRADE_LEVELS[6] = { 5, 20, 40, 60, 80, 95 };
-static const char* const W_GRADE_NAMES[5] = { TR::WQL_MID, TR::WQL_REFIT, TR::WQL_CATUN2, TR::WQL_MK3, TR::WQL_MEITOU };
+static const char* const W_GRADE_NAMES[5] = { TR(WQL_MID), TR(WQL_REFIT), TR(WQL_CATUN2), TR(WQL_MK3), TR(WQL_MEITOU) };
 static const int         W_GRADE_LEVELS[5] = { 20, 40, 60, 80, 100 };
 
 // quality combo driven by the numeric level: shows auto when level == autoVal,
@@ -1222,10 +1228,10 @@ static const int         W_GRADE_LEVELS[5] = { 20, 40, 60, 80, 100 };
 static void GradeCombo(const char* id, const char* label, int* level, int autoVal,
     const char* const* names, int n, const int* levels)
 {
-    const char* preview = TR::OPT_AUTO;
+    const char* preview = TR(OPT_AUTO);
     if (*level != autoVal)
     {
-        preview = TR::QL_CUSTOM;
+        preview = TR(QL_CUSTOM);
         for (int q = 0; q < n; ++q)
             if (*level == levels[q]) { preview = names[q]; break; }
     }
@@ -1234,7 +1240,7 @@ static void GradeCombo(const char* id, const char* label, int* level, int autoVa
     ImGui::SetNextItemWidth(-1.0f);
     if (ImGui::BeginCombo(id, preview))
     {
-        if (ImGui::Selectable(TR::OPT_AUTO, *level == autoVal))
+        if (ImGui::Selectable(TR(OPT_AUTO), *level == autoVal))
             *level = autoVal;
         for (int q = 0; q < n; ++q)
             if (ImGui::Selectable(names[q], *level == levels[q]))
@@ -1275,7 +1281,7 @@ static void DrawItemsTab()
 
     // search + category
     ImGui::PushItemWidth(220.0f);
-    if (ImGui::InputText(TR::LBL_SEARCH, g_searchBuf, sizeof(g_searchBuf)))
+    if (ImGui::InputText(TR(LBL_SEARCH), g_searchBuf, sizeof(g_searchBuf)))
     {
         std::string f = ToLower(g_searchBuf);
         RefreshVisibleItems(f.c_str());
@@ -1283,8 +1289,8 @@ static void DrawItemsTab()
     ImGui::PopItemWidth();
     ImGui::SameLine();
     static const char* catNames[6] = {
-        TR::CAT_ALL, TR::CAT_WEAPON, TR::CAT_ARMOUR,
-        TR::CAT_ITEM, TR::CAT_CROSSBOW, TR::CAT_CONTAINER
+        TR(CAT_ALL), TR(CAT_WEAPON), TR(CAT_ARMOUR),
+        TR(CAT_ITEM), TR(CAT_CROSSBOW), TR(CAT_CONTAINER)
     };
     ImGui::SetNextItemWidth(130.0f);
     if (ImGui::BeginCombo("##cat", catNames[g_curCat]))
@@ -1303,7 +1309,7 @@ static void DrawItemsTab()
         ImGui::EndCombo();
     }
     ImGui::SameLine();
-    ImGui::Text("%s%d", TR::MSG_ITEMS_LOADED, (int)g_itemsCache.size());
+    ImGui::Text("%s%d", TR(MSG_ITEMS_LOADED), (int)g_itemsCache.size());
 
     ImGui::Separator();
 
@@ -1349,14 +1355,14 @@ static void DrawItemsTab()
         }
     }
 
-    GameDataCombo("##company", TR::LBL_MANUFACTURER, g_companies, &g_selCompany, weaponLike);
-    GameDataCombo("##model", TR::LBL_MODEL, g_variants, &g_selVariant, weaponLike);
+    GameDataCombo("##company", TR(LBL_MANUFACTURER), g_companies, &g_selCompany, weaponLike);
+    GameDataCombo("##model", TR(LBL_MODEL), g_variants, &g_selVariant, weaponLike);
 
     if (weaponLike)
     {
-        GradeCombo("##wgrade", TR::LBL_QUALITY, &g_weaponLevel, 0,
+        GradeCombo("##wgrade", TR(LBL_QUALITY), &g_weaponLevel, 0,
             W_GRADE_NAMES, 5, W_GRADE_LEVELS);
-        ImGui::TextUnformatted(TR::LBL_LEVEL_W);
+        ImGui::TextUnformatted(TR(LBL_LEVEL_W));
         ImGui::SameLine();
         ImGui::PushItemWidth(110.0f);
         ImGui::InputInt("##wlevel", &g_weaponLevel, 1, 10);
@@ -1367,9 +1373,9 @@ static void DrawItemsTab()
 
     if (armourLike || crossbowLike)
     {
-        GradeCombo("##grade", TR::LBL_QUALITY, &g_gearLevel, -1,
+        GradeCombo("##grade", TR(LBL_QUALITY), &g_gearLevel, -1,
             A_GRADE_NAMES, 6, A_GRADE_LEVELS);
-        ImGui::TextUnformatted(TR::LBL_LEVEL_A);
+        ImGui::TextUnformatted(TR(LBL_LEVEL_A));
         ImGui::SameLine();
         ImGui::PushItemWidth(110.0f);
         ImGui::InputInt("##glevel", &g_gearLevel, 1, 10);
@@ -1379,17 +1385,17 @@ static void DrawItemsTab()
     }
 
     ImGui::PushItemWidth(90.0f);
-    ImGui::InputInt(TR::LBL_COUNT, &g_qty, 1, 10);
+    ImGui::InputInt(TR(LBL_COUNT), &g_qty, 1, 10);
     ImGui::PopItemWidth();
     if (g_qty < 1) g_qty = 1;
     if (g_qty > 999) g_qty = 999;
 
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.20f, 0.55f, 0.30f, 0.95f));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.28f, 0.70f, 0.40f, 1.0f));
-    if (ImGui::Button(TR::BTN_SPAWN, ImVec2(-1.0f, 0)))
+    if (ImGui::Button(TR(BTN_SPAWN), ImVec2(-1.0f, 0)))
         DoSpawn();
     ImGui::PopStyleColor(2);
-    ImGui::TextWrapped("%s", TR::BTN_DRAG_HINT);
+    ImGui::TextWrapped("%s", TR(BTN_DRAG_HINT));
     ImGui::EndChild();
 }
 
@@ -1418,7 +1424,7 @@ void DrawTrainerUI()
 
     // entry window: draggable by title, click button toggles the panel
     ImGui::SetNextWindowPos(ImVec2(10.0f, 10.0f), ImGuiCond_FirstUseEver);
-    ImGui::Begin(TR::APP_NAME, NULL,
+    ImGui::Begin(TR(APP_NAME), NULL,
         ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize |
         ImGuiWindowFlags_NoCollapse);
     if (ImGui::Button(g_showMenu ? "\xE5\x85\xB3\xE9\x97\xAD\xE9\x9D\xA2\xE6\x9D\xBF" : "\xE5\xBC\x80\xE5\x90\xAF\xE9\x9D\xA2\xE6\x9D\xBF"))
@@ -1434,21 +1440,21 @@ void DrawTrainerUI()
 
     ImGui::SetNextWindowSize(ImVec2(620.0f, 520.0f), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowPos(ImVec2(220.0f, 80.0f), ImGuiCond_FirstUseEver);
-    if (ImGui::Begin(TR::WINDOW_TITLE, &g_showMenu, 0))
+    if (ImGui::Begin(TR(WINDOW_TITLE), &g_showMenu, 0))
     {
         if (ImGui::BeginTabBar("##tabs"))
         {
-            if (ImGui::BeginTabItem(TR::TAB_STATS))
+            if (ImGui::BeginTabItem(TR(TAB_STATS)))
             {
                 DrawStatsTab();
                 ImGui::EndTabItem();
             }
-            if (ImGui::BeginTabItem(TR::TAB_ITEMS))
+            if (ImGui::BeginTabItem(TR(TAB_ITEMS)))
             {
                 DrawItemsTab();
                 ImGui::EndTabItem();
             }
-            if (ImGui::BeginTabItem(TR::TAB_BUILD))
+            if (ImGui::BeginTabItem(TR(TAB_BUILD)))
             {
                 DrawBuildTab();
                 ImGui::EndTabItem();
@@ -1465,8 +1471,62 @@ void DrawTrainerUI()
 // Plugin entry
 // ----------------------------------------------------------------------------
 
+
+// ----------------------------------------------------------------------------
+// UI language detection. LocaleManager::getInstance()->(field 0x78) holds the
+// active LocaleInfo*; LocaleInfo: id @0x8, name (wstring) @0x30, steamCode @0x58.
+// Chinese when id/steamCode says zh/cn/chinese, or the locale name has CJK
+// chars. Defaults to Chinese (the original UI language) on any failure.
+// ----------------------------------------------------------------------------
+
+static bool IsChineseLocaleId(const char* id, const char* sc, const wchar_t* nm);
+
+static bool DetectChineseUI()
+{
+    const char* id = NULL;
+    const char* sc = NULL;
+    const wchar_t* nm = NULL;
+    __try
+    {
+        LocaleManager* lm = LocaleManager::getInstance();
+        if (!lm)
+            return true;
+        LocaleInfo* cur = *(LocaleInfo**)((char*)lm + 0x78);
+        if (!cur)
+            return true;
+        id = ((const std::string*)((char*)cur + 0x8))->c_str();
+        nm = ((const std::wstring*)((char*)cur + 0x30))->c_str();
+        sc = ((const std::string*)((char*)cur + 0x58))->c_str();
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER) { return true; }
+
+    if (!id)
+        return true;
+    return IsChineseLocaleId(id, sc, nm);
+}
+
+static bool IsChineseLocaleId(const char* id, const char* sc, const wchar_t* nm)
+{
+    std::string lid = ToLower(id);
+    std::string lsc = sc ? ToLower(sc) : "";
+    if (lid.find("zh") != std::string::npos || lid.find("cn") != std::string::npos ||
+        lsc.find("zh") != std::string::npos || lsc.find("chinese") != std::string::npos)
+        return true;
+    if (lid.find("en") == 0 || lsc.find("english") != std::string::npos)
+        return false;
+    if (nm)
+    {
+        for (const wchar_t* p2 = nm; *p2; ++p2)
+            if (*p2 >= 0x4E00 && *p2 <= 0x9FFF)
+                return true;
+    }
+    return true; // unknown locale: keep the original Chinese UI
+}
+
 __declspec(dllexport) void startPlugin()
 {
+    g_trChinese = DetectChineseUI();
+    DebugLog(std::string("KenshiTrainer: UI language = ") + (g_trChinese ? "Chinese" : "English"));
     BuildBypass_Install();
     Overlay_Init();
     DebugLog("KenshiTrainer plugin started");

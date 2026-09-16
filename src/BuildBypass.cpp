@@ -28,6 +28,44 @@ static bool PlacementVerification_Hook(PreviewBuilding* self)
     return ok;
 }
 
+// one-shot diagnostic: log the first bytes at a resolved game address so the
+// exact build-specific code can be analysed offline (see docs workflow).
+static bool SafeReadCode(void* addr, unsigned char* buf) // POD-only for SEH
+{
+    __try
+    {
+        memcpy(buf, addr, 64);
+        return true;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER) { return false; }
+}
+
+static void DumpCodeAt(const char* name, void* addr)
+{
+    if (!addr)
+    {
+        DebugLog(std::string("KenshiTrainer: code@") + name + " = NULL");
+        return;
+    }
+    unsigned char buf[64];
+    if (!SafeReadCode(addr, buf))
+    {
+        DebugLog(std::string("KenshiTrainer: code@") + name + " read failed");
+        return;
+    }
+    char tmp[8];
+    std::string hex;
+    char addrbuf[24];
+    sprintf_s(addrbuf, "%p ", addr);
+    hex = addrbuf;
+    for (int i = 0; i < (int)sizeof(buf); ++i)
+    {
+        sprintf_s(tmp, "%02X", buf[i]);
+        hex += tmp;
+    }
+    DebugLog(std::string("KenshiTrainer: code@") + name + " " + hex);
+}
+
 bool BuildBypass_Enabled()
 {
     return g_buildBypass;
@@ -57,4 +95,13 @@ void BuildBypass_Install()
         DebugLog("KenshiTrainer: placementVerification hook FAILED");
     else
         DebugLog("KenshiTrainer: placementVerification hook installed");
+        // diagnostics: dump the real build-specific code around the placement
+        // entry points (helps locate the separate town-distance refusal check)
+        DumpCodeAt("placementVerification", (void*)g_origPlacementVerification);
+        DumpCodeAt("buildingPlacementUpdate",
+                   (void*)KenshiLib::GetRealAddress(&PreviewBuilding::_NV_buildingPlacementUpdate));
+        DumpCodeAt("placeFinalPreviewBuilding",
+                   (void*)KenshiLib::GetRealAddress(&PreviewBuilding::_NV_placeFinalPreviewBuilding));
+        DumpCodeAt("figureOutWhichTown",
+                   (void*)KenshiLib::GetRealAddress(&PreviewBuilding::figureOutWhichTown));
 }
