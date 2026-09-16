@@ -1,0 +1,23 @@
+﻿<!--
+***********************************************************************************************
+Microsoft.Cpp.Itanium.Windows7.1SDK.targets
+
+WARNING:  DO NOT MODIFY this file unless you are knowledgeable about MSBuild and have
+          created a backup copy.  Incorrect changes to this file will make it
+          impossible to load or build your projects from the command-line or the IDE.
+
+This file defines the steps/targets required to build Visual C++ (version 10.0) projects 
+targeting Itanium (IA64) platforms using Windows 7.1 SDK resources.
+
+Copyright (C) Microsoft Corporation. All rights reserved.
+***********************************************************************************************
+-->
+
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="_WindowsSDKPrepareForBuild" BeforeTargets="_PrepareForBuild">
+    <!-- Error out if the user tried to use the Windows 7.1 SDK toolset but doesn't have Windows 7.1 SDK installed -->
+    <Error Text="Windows 7.1 SDK not found. Please make sure that the Windows 7.1 SDK is installed on the machine." Condition="'$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v7.1@InstallationFolder)'==''" />
+    <Error Text="You are attempting to build an Itanium (IA64) application from an x86 environment. If using the Windows 7.1 SDK build environment, type setenv /ia64" Condition="'$(WindowsSDKVersionOverride' != '' and '$(TARGET_CPU)' == 'x86'"/>
+    <Error Text="You are attempting to build an Itanium (IA64) application from an x64 environment. If using the Windows 7.1 SDK build environment, type setenv /ia64" Condition="'$(WindowsSDKVersionOverride' != '' and '$(TARGET_CPU)' == 'x64'"/>
+  </Target>  
+</Project>

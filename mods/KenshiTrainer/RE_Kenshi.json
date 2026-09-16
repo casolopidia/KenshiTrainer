@@ -1,0 +1,4 @@
+{
+	"PreloadPlugins" : [ "KenshiTrainer.dll" ],
+	"Plugins" : []
+}

@@ -1,0 +1,39 @@
+{0x00006228} 2026-09-15 11:31:53 [info]: ** Kenshi start **
+{0x00006228} 2026-09-15 11:31:53 [info]: Version: 1.0.65 - x64 (Newland) (Steam)
+{0x00006228} 2026-09-15 11:31:53 [info]: OS version: 6.2 (9200)
+{0x00006228} 2026-09-15 11:31:53 [info]: CPU ID: AuthenticAMD: AMD Ryzen 7 5800H with Radeon Graphics
+{0x00006228} 2026-09-15 11:31:53 [info]: Physical memory total: 15.9 GB
+{0x00006228} 2026-09-15 11:31:53 [info]: Number of threads: 16
+{0x00006228} 2026-09-15 11:31:53 [info]: Startup
+{0x00006228} 2026-09-15 11:31:53 [info]: Renderer Created
+{0x00006228} 2026-09-15 11:31:54 [info]: [Launcher] Initialising
+{0x00006228} 2026-09-15 11:31:55 [info]: [Launcher] Creating widgets
+{0x00006228} 2026-09-15 11:31:55 [info]: [Launcher] Validating mod list
+{0x00006228} 2026-09-15 11:31:55 [info]: [Launcher] Initialised
+{0x00006228} 2026-09-15 11:31:56 [info]: [Launcher] Nvidia profile checked
+{0x00006228} 2026-09-15 11:32:06 [info]: [Launcher] Validating mod list
+{0x00006228} 2026-09-15 11:32:21 [info]: [Launcher] Validating mod list
+{0x00006228} 2026-09-15 11:32:24 [info]: [Launcher] Launching game...
+{0x00006228} 2026-09-15 11:32:25 [info]: ** Thread 'ResourceLoader' (0x000060f4) start **
+{0x00006228} 2026-09-15 11:32:25 [info]: Rendering device: NVIDIA GeForce RTX 3070 Laptop GPU
+{0x00006228} 2026-09-15 11:32:25 [info]: Fullscreen: Yes
+{0x00006228} 2026-09-15 11:32:25 [info]: Window size: 2560x1600
+{0x00006228} 2026-09-15 11:32:25 [info]: UI scale: (1.33333, 1.48148)
+{0x00006228} 2026-09-15 11:32:25 [info]: *** Initializing OIS ***
+{0x00006228} 2026-09-15 11:32:25 [info]: WINDOW RESIZED: 2560x1600
+{0x00006228} 2026-09-15 11:32:26 [info]: Root Initialised
+{0x00006228} 2026-09-15 11:32:26 [info]: Started
+{0x00006228} 2026-09-15 11:32:26 [info]: ** Thread 'Audio' (0x00007940) start **
+{0x00006228} 2026-09-15 11:32:26 [info]: Initialising GameData
+{0x00006228} 2026-09-15 11:32:26 [info]: [Mods] Loaded core gamedata.base.
+{0x00006228} 2026-09-15 11:32:26 [info]: [Mods] Loaded core mod: Newwworld
+{0x00006228} 2026-09-15 11:32:26 [info]: [Mods] Loaded core mod: Dialogue
+{0x00006228} 2026-09-15 11:32:27 [info]: [Mods] Loaded core mod: rebirth
+{0x00006228} 2026-09-15 11:32:27 [warning]: [Mods] Item 吹哨者 (43675-rebirth.mod) modified by zh_CN.translation does not exist
+{0x00006228} 2026-09-15 11:32:27 [info]: [Mods] Core translation mod file loaded: ./locale\zh_CN\zh_CN.translation
+{0x00006228} 2026-09-15 11:32:27 [info]: [Mods] Loaded mod: KenshiTrainer
+{0x00006228} 2026-09-15 11:32:33 [info]: WINDOW RESIZED: 2560x1600
+{0x00006228} 2026-09-15 11:32:34 [info]: WINDOW RESIZED: 2560x1440
+{0x00006228} 2026-09-15 11:32:53 [info]: Compositor Setup
+{0x00006228} 2026-09-15 11:32:53 [info]: NodeList Setup
+{0x00006228} 2026-09-15 11:32:54 [info]: Starting Title Screen

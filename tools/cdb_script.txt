@@ -1,0 +1,8 @@
+.sympath+ D:\kenshi?????mod\src\x64\Release
+.reload
+u Kenshi_x64+0x911fa2 L20
+.echo ====SHOW_RVA_9116D0====
+u Kenshi_x64+0x9116d0 L30
+.echo ====STACKAREA====
+dps 0035f430 L10
+q

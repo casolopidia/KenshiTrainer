@@ -1,0 +1,51 @@
+这篇文章需要改进。你可以帮助Kenshi来编辑它。
+
+在Kenshi世界中，区域中的天气取决于该区域正处于什么季节。绝大多数区域只有一种季节，但也有区域有多个季节。有多个季节的区域的每个季节在一年中的时间大致均等，尽管并不一定。Kenshi世界中一年只有100天。
+
+有些季节的天气是带有天气效果的。这些效果可能有害健康，或对战斗有负面影响。
+
+季节数量
+降雨概率
+酸雨概率
+沙尘暴概率
+风力分布
+
+
+
+
+季节列表
+中文名称	英文名称	具有该季节的区域数
+“酸性森林”燃烧森林	"acid forest" Burning Forest	1
+灰烬之地 基础	Ashland_Basic	1
+骸骨荒原干旱	Boneyard dry times	4
+边境之地	Border Zone	3
+“晴朗和风暴混合短季节”剥皮人的漫游	"Clear AND Storm Mix SHORTSEASON" Skinner's Roam	1
+“晴朗”剥皮人的漫游	"Clear Times" Skinner's Roam	1
+海滨	Coastal	9
+螃蟹岛	Crabby Island	2
+死亡之地	Deadlands	2
+沙漠温和	Desert mild	5
+落叶	Drifting-foliage	2
+“沙尘暴逼近”剥皮人的漫游	"Dust Storm Approach" Skinner's Roam	1
+“肥沃绿地，时而有雨”	"fertile green, occasional rain"	3
+洪泛地	Floodland	1
+雾岛	Fog Islands	1
+大沙漠	Great Desert	1
+大沙漠小型	Great Desert small	3
+灰色沙漠	Grey Desert	2
+“暴雨少量酸雨”鱼形人之岛	"mad rain with rare acid" Fishman Island	1
+“只有微雨和风”	"nothing, bit of rain, wind"	2
+“毒气”黑色沙漠	"poison gas" Black Desert	1
+紫色沙漠	Purple Desert	2
+“随机酸雨”	"random acid"	2
+皇家山谷	Royal Valley	3
+暗黑苍穹	Sonorous Dark	1
+南方海岸	South Coast	3
+斯坦沙漠	Stenn Desert	1
+沼泽地	Swamp	2
+极恶之地	The Pits	3
+虚荣谷	Vain	2
+复仇之谷	Venge	1
+火山区	Volcano Zone	2
+“主要是湿润的森林”尖叫森林	"wet forest -main" The Shrieking Forest	1
+南方湿地	wetlands south	2

@@ -1,0 +1,11 @@
+.echo ====FN_911FB0_full====
+u Kenshi_x64+0x911fb0 L40
+.echo ====FN_3E837B====
+u Kenshi_x64+0x3e837b-0x30 L40
+.echo ====FN_3E8024====
+u Kenshi_x64+0x3e8024-0x20 L30
+.echo ====FN_3E7EA9====
+u Kenshi_x64+0x3e7ea9-0x20 L30
+.echo ====TRAMPOLINE====
+u RE_Kenshi+0x1f49a-0x10 L30
+q

@@ -1,0 +1,26 @@
+这篇文章需要改进。你可以帮助Kenshi来编辑它。
+
+FCS中的GLOBAL CONSTANTS，影响如下方面：
+
+Block success 格挡成功率
+base block chance - 防御方近战防御属性等于敌方近战攻击（或 武术）时，成功格挡的基础概率，默认70%
+block chance increase per 10levels - 若自身防御等级比敌方攻击高 10 级，格挡成功率提升该数值（默认12%）；格挡概率上限为 95%
+block chance reduction per 10levels - 若自身防御等级比敌方攻击低 10 级，格挡成功率降低该数值（默认15%）；格挡概率下限为 5%
+Combat balance 战斗平衡
+attack chance factor - 角色近战攻击属性高于对手时，获得优先出手的加成系数（默认0.05）。计算公式：1 + attack chance factor × 自身高出敌方的攻击等级 = 先出手几率乘数
+默认0.05 的情况下，近战攻击高出对手10级，先出手概率是对手的1+10x0.05=1.5倍
+max num attack slots - 受大量其他机制影响。影响攻击槽机制（待补充）
+Combat damage 战斗伤害
+blunt damage 1 -20
+blunt damage 99 -80
+blunt permanent organ damage - 钝击伤害是否附带红条（切割伤害默认自带该效果）。默认数值为 0 ，钝击仅造成钝器伤害；数值为 1 时，钝击会造成切割损伤
+bow damage 1 - 该数值（默认1.1）与十字弩的 Pierce damage min 0、Pierce damage min 1 相乘，计算十字弩最低穿刺伤害
+bow damage 99 - 该数值（默认1.2）与十字弩的 Pierce damage max 0、Pierce damage max 1 相乘，计算十字弩最高穿刺伤害
+cut damage 1 - 默认20。cut damage 1 × damage multiplier = 切割类武器基础最低切割伤害。主切割的武器成长伤害计算公式：(cut damage 99 − cut damage 1) × global damage mult，每 1 点武器的切割伤害对应该数值成长量：每 100 点敏捷获得一半加成，每 100 点武器技能获得另一半加成
+cut damage 99 -默认80
+damage resistance max - 韧性达到 100 级时的伤害减免系数（默认0.65）。1 = 减免 100% 伤害，0 = 无减免，-1 = 受到伤害翻倍，以此类推；韧性超过 100 级后该数值不再变化。若数值大于 1，高韧性单位受击后会回血
+damage resistance min - 韧性 Toughness 为 0 级时的伤害减免系数（默认-0.65）。1 = 减免 100% 伤害，0 = 无减免，-1 = 受到伤害翻倍，以此类推；韧性低于 0 级无额外变化
+immediate blood loss -默认0.2。 即时失血计算公式：造成切割伤害 × 武器失血系数 × 目标种族失血倍率 × immediate blood loss = 角色受击瞬间流失的血液 / 石油量
+pierce damage multiplier - 武器穿刺成长伤害（鱼叉伤害）倍率（默认1.2），会再乘以全局 damage multiplier。原版游戏除大猩猩 Gorillos 外所有动物武器均启用该参数，是野兽高额伤害的核心来源，同时护甲可大幅克制该伤害
+stumble damage max - 单位受击必然进入硬直，而 stumble 是高额伤害触发的长僵直动画。参数描述存在误导，实际生效数值为 stumble damage max × damage multiplier。默认值 80，韧性 100 级时最终生效值为 52
+unarmed damage mult - 参数描述不准确。标注为影响全部徒手伤害计算，实际仅作用于武术依靠韧性获得的伤害加成部分

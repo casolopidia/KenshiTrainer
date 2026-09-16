@@ -1,0 +1,397 @@
+这篇文章需要改进。你可以帮助Kenshi来编辑它。
+未完成
+
+本页面内容参考了Dialogue Conditions & Effects
+
+DA = Dialogue action（对话产生的行为）
+
+新版的 FCS 能搜索所有应用了某对话效果的对话。使用“action name = X”在“Everything”处进行搜索，X 是该条件对应的数值。
+
+非DA开头效果
+CHOOSE_ANIMALS_BUYING
+
+action name = 48
+
+CHOOSE_CONSCRIPTION
+
+action name = 44
+
+CHOOSE_HIRING_CONTRACT
+
+action name = 46
+
+CHOOSE_PRISONER_BAIL
+
+action name = 43
+
+CHOOSE_RECRUITING
+
+action name = 45
+
+CHOOSE_SLAVES_BUYING
+
+action name = 42
+
+CHOOSE_SLAVES_SELLING
+
+action name = 41
+
+SURRENDER_NON_HUMANS
+
+action name = 47
+
+
+
+
+A
+Affect_Relations
+
+DA_AFFECT_RELATIONS
+
+action name = 4
+
+Affect_Reputation
+
+DA_AFFECT_REPUTATION
+
+action name = 5
+
+Arrest_Target
+
+DA_ARREST_TARGET
+
+action name = 29
+
+Arrest_Targets_Carried_Person
+
+DA_ARREST_TARGETS_CARRIED_PERSON
+
+action name = 30
+
+Assault_Phase
+
+DA_ASSAULT_PHASE
+
+action name = 37
+
+Assign_Bounty
+
+DA_ASSIGN_BOUNTY
+
+action name = 32
+
+Attack_Chase_Forever
+
+DA_ATTACK_CHASE_FOREVER
+
+action name = 6
+
+Attack_If_No_Coexist
+
+DA_ATTACK_IF_NO_COEXIST
+
+action name = 57
+
+Attack_Stay_Near_Home
+
+DA_ATTACK_STAY_NEAR_HOME
+
+action name = 55
+
+Attack_Town
+
+DA_ATTACK_TOWN
+
+action name = 31
+
+
+
+
+C
+Character_Editor
+
+DA_CHARACTER_EDITOR
+
+action name = 11
+
+Clear_AI
+
+DA_CLEAR_AI
+
+action name = 15
+
+Clear_Bounty
+
+DA_CLEAR_BOUNTY
+
+action name = 49
+
+Crime_Alarm
+
+DA_CRIME_ALARM
+
+action name = 33
+
+
+
+
+D-E
+Declare_War
+
+DA_DECLARE_WAR
+
+action name = 13
+
+End_War
+
+DA_END_WAR
+
+action name = 14
+
+Enslave_Targets_Carried_Person
+
+DA_ENSLAVE_TARGETS_CARRIED_PERSON
+
+action name = 40
+
+
+
+
+F
+Flag_Temp_Ally
+
+DA_FLAG_TEMP_ALLY
+
+action name = 20
+
+Flag_Temp_Enemy
+
+DA_FLAG_TEMP_ENEMY
+
+action name = 21
+
+Follow_While_Talking
+
+DA_FOLLOW_WHILE_TALKING
+
+action name = 16
+
+Force_Speech_Timer
+
+DA_FORCE_SPEECH_TIMER
+
+action name = 12
+
+Free_Target_Slave
+
+DA_FREE_TARGET_SLAVE
+
+action name = 26
+
+
+
+
+G
+Give_Money
+
+DA_GIVE_MONEY
+
+action name = 9
+
+Give_Target_My_Slaves
+
+DA_GIVE_TARGET_MY_SLAVES
+
+action name = 24
+
+Go_Home
+
+DA_GO_HOME
+
+action name = 7
+
+
+
+
+I-J
+Increase_Faction_Rank
+
+DA_INCREASE_FACTION_RANK
+
+action name = 35
+
+Join_Squad_Fast
+
+DA_JOIN_SQUAD_FAST
+
+action name = 18
+
+Join_Squad_With_Edit
+
+DA_JOIN_SQUAD_WITH_EDIT
+
+action name = 3
+
+
+
+
+K-L
+Knockout
+
+DA_KNOCKOUT
+
+action name = 58
+
+Lock_This_Dialog
+
+DA_LOCK_THIS_DIALOG
+
+action name = 36
+
+
+
+
+M
+Make_Target_Run_Faster
+
+DA_MAKE_TARGET_RUN_FASTER
+
+action name = 23
+
+Massive_Alarm
+
+DA_MASSIVE_ALARM
+
+action name = 56
+
+Mates_Kill_Me
+
+DA_MATES_KILL_ME
+
+action name = 22
+
+Merge_With_Similar_Squads
+
+DA_MERGE_WITH_SIMILAR_SQUADS
+
+action name = 27
+
+
+
+
+O
+Open_Nearest_Gate
+
+DA_OPEN_NEAREST_GATE
+
+action name = 54
+
+
+
+
+P
+Pay_Bounty
+
+DA_PAY_BOUNTY
+
+action name = 10
+
+Player_Sell_Prisoners
+
+DA_PLAYER_SELL_PRISONERS
+
+action name = 50
+
+Player_Surrender_Member_Different_Race
+
+DA_PLAYER_SURRENDER_MEMBER_DIFFERENT_RACE
+
+action name = 51
+
+
+
+
+R
+Remember_Character
+
+DA_REMEMBER_CHARACTER
+
+action name = 19
+
+Remove_Slave_Status
+
+DA_REMOVE_SLAVE_STATUS
+
+action name = 53
+
+Retreat_Phase
+
+DA_RETREAT_PHASE
+
+action name = 38
+
+Run_Away
+
+DA_RUN_AWAY
+
+action name = 34
+
+
+
+
+S
+Separate_To_My_Own_Squad
+
+DA_SEPARATE_TO_MY_OWN_SQUAD
+
+action name = 28
+
+Summon_My_Squad
+
+DA_SUMMON_MY_SQUAD
+
+action name = 52
+
+
+
+
+T
+Tag_Escaped_Slave
+
+DA_TAG_ESCAPED_SLAVE
+
+action name = 25
+
+Take_Money
+
+DA_TAKE_MONEY
+
+action name = 8
+
+Talk_To_Leader
+
+DA_TALK_TO_LEADER
+
+action name = 2
+
+Thug_Hunter
+
+DA_THUG_HUNTER
+
+action name = 17
+
+Trade
+
+DA_TRADE
+
+action name = 1
+
+
+
+
+V
+Victory_Phase
+
+DA_VICTORY_PHASE
+
+action name = 39

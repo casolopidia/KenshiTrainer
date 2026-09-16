@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{8f3a2c1e-5b6d-4e7a-9c1d-2e3f4a5b6c7d}</ProjectGuid>
+    <RootNamespace>KenshiTrainer</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <TrackFileAccess>false</TrackFileAccess>
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v100</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>KenshiTrainer</TargetName>
+    <IncludePath>$(KENSHILIB_DEPS_DIR);$(KENSHILIB_DIR)/Include;$(KENSHILIB_DIR)/Include/ogre;$(BOOST_INCLUDE_PATH);$(ProjectDir)..\reference\imgui-1.86;$(ProjectDir)..\reference\imgui-1.86\backends;$(IncludePath)</IncludePath>
+    <LibraryPath>$(KENSHILIB_DIR)/Libraries;$(BOOST_INCLUDE_PATH)/stage/lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>false</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>kenshilib.lib;MyGUIEngine_x64.lib;OgreMain_x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="KenshiTrainer.cpp" />
+    <ClCompile Include="BuildBypass.cpp" />
+    <ClCompile Include="Overlay.cpp" />
+    <ClCompile Include="..\reference\imgui-1.86\imgui.cpp" />
+    <ClCompile Include="..\reference\imgui-1.86\imgui_draw.cpp" />
+    <ClCompile Include="..\reference\imgui-1.86\imgui_widgets.cpp" />
+    <ClCompile Include="..\reference\imgui-1.86\imgui_tables.cpp" />
+    <ClCompile Include="..\reference\imgui-1.86\backends\imgui_impl_win32.cpp" />
+    <ClCompile Include="..\reference\imgui-1.86\backends\imgui_impl_dx11.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ChineseStrings.h" />
+    <ClInclude Include="StatNames.h" />
+    <ClInclude Include="Overlay.h" />
+    <ClInclude Include="BuildBypass.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

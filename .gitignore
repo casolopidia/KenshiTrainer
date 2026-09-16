@@ -1,0 +1,23 @@
+src/x64/
+x64/
+*.obj
+*.pdb
+*.lastbuildstate
+*.unsuccessfulbuild
+*.tlog
+logs/
+_replay/
+_replay_*
+_cand_*.txt
+_*.py
+.vs/
+Thumbs.db
+
+# large setup media (recoverable from Microsoft)
+tools/*.iso
+
+# vendored reference material stays local (recoverable: GitHub/imgui zip/tools)
+reference/
+
+# reverse-engineering binaries stay local per project convention
+Dust/

@@ -1,0 +1,388 @@
+11:32:25  |  Platform  |  Info  |  * Initialise: RenderManager  |  ..\..\..\..\Platforms\Ogre\OgrePlatform\src\MyGUI_OgreRenderManager.cpp  |  75
+11:32:25  |  Platform  |  Info  |  RenderManager successfully initialized  |  ..\..\..\..\Platforms\Ogre\OgrePlatform\src\MyGUI_OgreRenderManager.cpp  |  109
+11:32:25  |  Platform  |  Info  |  * Initialise: DataManager  |  ..\..\..\..\Platforms\Ogre\OgrePlatform\src\MyGUI_OgreDataManager.cpp  |  27
+11:32:25  |  Platform  |  Info  |  DataManager successfully initialized  |  ..\..\..\..\Platforms\Ogre\OgrePlatform\src\MyGUI_OgreDataManager.cpp  |  35
+11:32:25  |  Core  |  Info  |  * Initialise: Gui  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_Gui.cpp  |  63
+11:32:25  |  Core  |  Info  |  * MyGUI version 3.2.3  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_Gui.cpp  |  68
+11:32:25  |  Core  |  Info  |  * Initialise: ResourceManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  32
+11:32:25  |  Core  |  Info  |  ResourceManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  40
+11:32:25  |  Core  |  Info  |  * Initialise: LayerManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_LayerManager.cpp  |  33
+11:32:25  |  Core  |  Info  |  LayerManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_LayerManager.cpp  |  41
+11:32:25  |  Core  |  Info  |  * Initialise: WidgetManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_WidgetManager.cpp  |  56
+11:32:25  |  Core  |  Info  |  WidgetManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_WidgetManager.cpp  |  90
+11:32:25  |  Core  |  Info  |  * Initialise: InputManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_InputManager.cpp  |  46
+11:32:25  |  Core  |  Info  |  InputManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_InputManager.cpp  |  66
+11:32:25  |  Core  |  Info  |  * Initialise: SubWidgetManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_SubWidgetManager.cpp  |  36
+11:32:25  |  Core  |  Info  |  SubWidgetManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_SubWidgetManager.cpp  |  56
+11:32:25  |  Core  |  Info  |  * Initialise: SkinManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_SkinManager.cpp  |  36
+11:32:25  |  Core  |  Info  |  SkinManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_SkinManager.cpp  |  46
+11:32:25  |  Core  |  Info  |  * Initialise: FontManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_FontManager.cpp  |  32
+11:32:25  |  Core  |  Info  |  FontManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_FontManager.cpp  |  42
+11:32:25  |  Core  |  Info  |  * Initialise: ColourManager  |  ..\..\MyGUIEngine\src\MyGUI_ColourManager.cpp  |  31
+11:32:25  |  Core  |  Info  |  ColourManager successfully initialized  |  ..\..\MyGUIEngine\src\MyGUI_ColourManager.cpp  |  35
+11:32:25  |  Core  |  Info  |  * Initialise: ControllerManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ControllerManager.cpp  |  33
+11:32:25  |  Core  |  Info  |  ControllerManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ControllerManager.cpp  |  42
+11:32:25  |  Core  |  Info  |  * Initialise: PointerManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_PointerManager.cpp  |  43
+11:32:25  |  Core  |  Info  |  PointerManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_PointerManager.cpp  |  62
+11:32:25  |  Core  |  Info  |  * Initialise: ClipboardManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ClipboardManager.cpp  |  32
+11:32:25  |  Core  |  Info  |  ClipboardManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ClipboardManager.cpp  |  39
+11:32:25  |  Core  |  Info  |  * Initialise: LayoutManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_LayoutManager.cpp  |  28
+11:32:25  |  Core  |  Info  |  LayoutManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_LayoutManager.cpp  |  35
+11:32:25  |  Core  |  Info  |  * Initialise: DynLibManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_DynLibManager.cpp  |  26
+11:32:25  |  Core  |  Info  |  DynLibManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_DynLibManager.cpp  |  30
+11:32:25  |  Core  |  Info  |  * Initialise: PluginManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_PluginManager.cpp  |  30
+11:32:25  |  Core  |  Info  |  PluginManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_PluginManager.cpp  |  34
+11:32:25  |  Core  |  Info  |  * Initialise: LanguageManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_LanguageManager.cpp  |  31
+11:32:25  |  Core  |  Info  |  LanguageManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_LanguageManager.cpp  |  35
+11:32:25  |  Core  |  Info  |  * Initialise: FactoryManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_FactoryManager.cpp  |  25
+11:32:25  |  Core  |  Info  |  FactoryManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_FactoryManager.cpp  |  27
+11:32:25  |  Core  |  Info  |  * Initialise: ToolTipManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ToolTipManager.cpp  |  33
+11:32:25  |  Core  |  Info  |  ToolTipManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ToolTipManager.cpp  |  45
+11:32:25  |  Core  |  Info  |  Gui successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_Gui.cpp  |  116
+11:32:25  |  Core  |  Info  |  Load ini file 'core_layer.xml'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  114
+11:32:25  |  Core  |  Info  |  Load ini file 'common_skins.xml'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  114
+11:32:25  |  Core  |  Info  |  Load ini file 'kenshi_skins.xml'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  114
+11:32:25  |  Core  |  Info  |  Load ini file 'kenshi_colours.xml'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  114
+11:32:25  |  Core  |  Info  |  Load ini file 'kenshi_images.xml'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  114
+11:32:25  |  Core  |  Info  |  Load ini file 'kenshi_pointers.xml'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  114
+11:32:25  |  Core  |  Info  |  Load ini file 'core_settings.xml'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  114
+11:32:25  |  Core  |  Info  |  Load ini file 'kenshi_templates.xml'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  114
+11:32:27  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Small' using texture size 1024 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:27  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Small' using real height 16 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:28  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_MediumSmall' using texture size 1024 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:28  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_MediumSmall' using real height 19 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:28  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Medium' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:28  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Medium' using real height 24 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:28  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Large' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:28  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Large' using real height 27 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:29  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Small' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:29  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Small' using real height 24 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:29  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Medium' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:29  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Medium' using real height 29 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:29  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Large' using texture size 2048 x 4096.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:29  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Large' using real height 33 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:31  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_BannerTextFont' using texture size 8192 x 16384.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:31  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_BannerTextFont' using real height 153 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:31  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Small' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:31  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Small' using real height 24 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:31  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Medium' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:31  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Medium' using real height 25 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:32  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Large' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:32  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Large' using real height 27 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:33  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_UI_Messages' using texture size 8192 x 8192.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:33  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_UI_Messages' using real height 112 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:34  |  Core  |  Info  |  Load ini file 'core_layer.xml'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  114
+11:32:34  |  Core  |  Info  |  Load ini file 'common_skins.xml'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  114
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'PanelEmpty'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'RotatingSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'ImageBox'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Canvas'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'EditClientSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'WhiteSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'PolygonalSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Info  |  Load ini file 'kenshi_skins.xml'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  114
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_NamePanelSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_HealthPanelTopSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_SquadPanelSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_InventoryPanelSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_FloorPanelSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_OrdersPanelSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_FloorArrowUpSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_Button1Skin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_TickButton1Skin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_SpeedPanelSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_TimeMoneyPanelSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_OrdersTextboxSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_SpeedTextboxSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_SquadTabButton1Skin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_FloorArrowDownSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_SpeedArrowLeftSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_SpeedArrowRightSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_TimeSpeedButton1Skin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_TimeSpeedButton2Skin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_TimeSpeedButton3Skin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_TimeSpeedButton4Skin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_GenericWindowSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_InventoryWindowSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_SliderButtonSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_SliderSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_InventorySlotSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_CloseButtonSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_HealthPanelBottomSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_LifeBarSplintSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_LifeBarHealedSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_LifeBarSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_LifeBarStunnedSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_LifeBarHurtSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_SpeedSymbol1Skin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_SpeedSymbol2Skin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_SpeedSymbol3Skin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_ExtendedStatsPanelSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_StatsPanelSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_ExtendedStatsButton'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_ProgressBarSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_ProgressBarEmptySkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_ProgressBarFilledSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_TextBoxEmptySkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_EditBoxEmptySkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_Input1OutputLineSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_Input2OutputLineSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_FloatingPanelSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_GenericTextBoxSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_GenericTextBoxBorderlessSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_GenericTextBoxFlatSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_GenericInputBoxSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_SmallArrowUpSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_SmallArrowDownSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_SmallBarSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_PausedTextSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_ConnectBarSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_SquadPanelHeaderSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_ListBoxItemSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_ScrollerVerticalSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_HScrollerButtonSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_FloatinglPanelSmallSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_LoadingTextSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_TickBoxSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_PinButtonSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_MinimizeButtonSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_BuildPanelSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_BuildButtonSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_BehaviorButtonSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_BehaviorSliderSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_FrameSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_PortraitFrameSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_SmallBarHSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_SmallArrowRightSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_SmallArrowLeftSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_VScrollerButtonSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_FloatingPanelThinSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_SpeechPanelSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_GenericWindowHeaderSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_InventoryWindowHeaderSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_WhiteLine'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_WhiteLine2'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_SmallScrollArrowLeftSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_SmallScrollArrowRightSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_SmallScrollArrowDownSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_SmallScrollArrowUpSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_ScrollerHorizontalSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_CenterMapButtonSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_GenericTextBoxFlatSmallSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_SelectionPanel'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_MessageSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_LifeBarRobotSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_LifeBarCrushedSkin'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Info  |  Load ini file 'kenshi_colours.xml'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  114
+11:32:34  |  Core  |  Info  |  Load ini file 'kenshi_fonts.xml'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  114
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_StandardFont_Small'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:34  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Small' using texture size 1024 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:34  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Small' using real height 16 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:34  |  Core  |  Warning  |  duplicate resource name 'Kenshi_StandardFont_MediumSmall'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:35  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_MediumSmall' using texture size 1024 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:35  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_MediumSmall' using real height 19 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:35  |  Core  |  Warning  |  duplicate resource name 'Kenshi_StandardFont_Medium'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:35  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Medium' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:35  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Medium' using real height 24 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:35  |  Core  |  Warning  |  duplicate resource name 'Kenshi_StandardFont_Large'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:35  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Large' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:35  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Large' using real height 27 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:35  |  Core  |  Warning  |  duplicate resource name 'Kenshi_PaintedTextFont_Small'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:36  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Small' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:36  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Small' using real height 24 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:36  |  Core  |  Warning  |  duplicate resource name 'Kenshi_PaintedTextFont_Medium'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:36  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Medium' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:36  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Medium' using real height 29 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:36  |  Core  |  Warning  |  duplicate resource name 'Kenshi_PaintedTextFont_Large'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:37  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Large' using texture size 2048 x 4096.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:37  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Large' using real height 33 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:37  |  Core  |  Warning  |  duplicate resource name 'Kenshi_BannerTextFont'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:38  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_BannerTextFont' using texture size 8192 x 16384.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:38  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_BannerTextFont' using real height 153 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:38  |  Core  |  Warning  |  duplicate resource name 'Kenshi_FloaterFont_Small'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:38  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Small' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:38  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Small' using real height 24 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:38  |  Core  |  Warning  |  duplicate resource name 'Kenshi_FloaterFont_Medium'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:39  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Medium' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:39  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Medium' using real height 25 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:39  |  Core  |  Warning  |  duplicate resource name 'Kenshi_FloaterFont_Large'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:39  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Large' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:39  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Large' using real height 27 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:39  |  Core  |  Warning  |  duplicate resource name 'Kenshi_UI_Messages'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_UI_Messages' using texture size 8192 x 8192.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:40  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_UI_Messages' using real height 112 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:40  |  Core  |  Info  |  Load ini file 'kenshi_images.xml'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  114
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_TitleScreen'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_LoadingScreen'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_Splash_LoFi'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_Splash_Logos'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'pic_PointerArrow'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'pic_PointerInvisible'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'pic_PointerBuild'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'pic_PointerSpanner'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'pic_PointerMine'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'pic_PointerLift'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'pic_PointerPickupItem'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'pic_PointerMed'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'pic_PointerTalk'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'pic_PointerSTalk'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'pic_PointerRed'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'pic_PointerGreen'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'pic_PointerHand'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'pic_PointerLock'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'pic_PointerLockpick'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'pic_PointerDoor'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'pic_PointerDoorEscape'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'pic_PointerHouse'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'pic_PointerSearch'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'pic_PointerUse'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'pic_PointerLight'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'pic_PointerSteal'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'pic_PointerKnockout'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'pic_PointerScavenge'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'pic_PointerInvalid'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_CharacterSpeedSet'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_SquadButtonCombatImage'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_PortraitImage'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_MiscImages'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_LoadingImage'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_MapMarkers'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_CharacterNameTags'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Info  |  Load ini file 'kenshi_pointers.xml'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  114
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'arrow'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'med'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'lift'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'pick_item'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'talk'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 's_talk'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'attk'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'green'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'hand'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'build'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'door'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'door_escape'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'lock'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'lockpick'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'use'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'mine'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'search'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'house'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'spanner'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'invisible'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'light'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'steal'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'invalidmove'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'knockout'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'scavenge'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Info  |  Load ini file 'core_settings.xml'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  114
+11:32:40  |  Core  |  Info  |  Load ini file 'kenshi_templates.xml'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  114
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_Button1'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_Button2'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_TickButton1'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_TickButton2'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_FloatingPanelLight'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_ProgressBarFill'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_SquadTabButton'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_SquadTabControl'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_TabControl'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_TabControlEmpty'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_ScrollBar'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_ScrollBarV'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_ScrollBarH'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_ScrollBarVBig'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_SliderVBig'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_ScrollBarHBig'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_SliderHBig'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_ScrollView'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_ScrollViewMap'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_ScrollViewEmpty'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_ScrollViewEmptyLight'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_ScrollViewEmptyEditor'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_BehaviorSlider'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_Window'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_WindowC'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_WindowCX'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_WindowCXP'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_WindowCXM'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_InventoryWindowCXP'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_GenericTextBoxFlat'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_GenericTextBoxFlatSmall'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_GenericTextBox'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_TextboxPaintedText'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_TextboxPaintedText_Large'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_TextboxStandardText_Small'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_TextboxStandardText'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_EditBoxStandardText'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_EditBoxPaintedText'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_TextboxStandardText_Large'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_ItemBoxEmpty'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_EditBox'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_EditBoxStrechEmpty'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_WordWrap'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_WordWrapEmpty'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_WordWrapEmpty_StandardText_Large'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_PaintedWordWrapEmpty'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_TitleWordWrapEmpty'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_ListBoxItem'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_ListBox'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_ListBoxEmpty'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_MultiListButton'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_MultiSubListBox'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_MultiListBox'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_ComboBox'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_Slider'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_ListSlider'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_MultiSlider'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:40  |  Core  |  Warning  |  duplicate resource name 'Kenshi_MultiSliderSmall'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  92
+11:32:41  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_BannerTextFont' using texture size 8192 x 8192.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:41  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_BannerTextFont' using real height 119 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:41  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Large' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:41  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Large' using real height 26 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:41  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Medium' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:41  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Medium' using real height 25 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:42  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Small' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:42  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Small' using real height 24 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:42  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Large' using texture size 2048 x 4096.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:42  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Large' using real height 31 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:43  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Medium' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:43  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Medium' using real height 27 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:43  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Small' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:43  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Small' using real height 24 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:43  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Large' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:43  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Large' using real height 26 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:44  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Medium' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:44  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Medium' using real height 24 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:44  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_MediumSmall' using texture size 2048 x 1024.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:44  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_MediumSmall' using real height 19 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:44  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Small' using texture size 1024 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:44  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Small' using real height 16 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:45  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_UI_Messages' using texture size 8192 x 4096.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:45  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_UI_Messages' using real height 89 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:54  |  Core  |  Warning  |  Widget property 'FontName' not found [Kenshi_NewGamePanel.layout]  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_Widget.cpp  |  1210
+11:32:54  |  Core  |  Warning  |  Widget property 'WordWrap' not found [Kenshi_NewGamePanel.layout]  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_Widget.cpp  |  1210
+11:32:54  |  Core  |  Warning  |  Widget property 'Static' not found [Kenshi_NewGamePanel.layout]  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_Widget.cpp  |  1210
+11:32:54  |  Core  |  Warning  |  Widget property 'Snap' not found []  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_Widget.cpp  |  1210
+11:32:55  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_BannerTextFont' using texture size 8192 x 8192.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:55  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_BannerTextFont' using real height 119 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:55  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Large' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:55  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Large' using real height 26 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:55  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Medium' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:55  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Medium' using real height 25 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:56  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Small' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:56  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Small' using real height 24 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:56  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Large' using texture size 2048 x 4096.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:56  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Large' using real height 31 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:56  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Medium' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:56  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Medium' using real height 27 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:57  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Small' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:57  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Small' using real height 24 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:57  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Large' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:57  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Large' using real height 26 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:57  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Medium' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:57  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Medium' using real height 24 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:58  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_MediumSmall' using texture size 2048 x 1024.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:58  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_MediumSmall' using real height 19 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:58  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Small' using texture size 1024 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:58  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Small' using real height 16 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:32:59  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_UI_Messages' using texture size 8192 x 4096.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:32:59  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_UI_Messages' using real height 89 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623

@@ -1,0 +1,54 @@
+为方便Mod制作，本页面中所有引用制作工具中词语的，均保留原文。
+
+武器(Mod制作)（暂译，英文：Weapons (Modding)）。本页面包含制作Kenshi武器Mod制作的有关信息。制作Mod需通过Forgotten Construction Set工具（下称FCS）。武器是物品分类下的一个子分类。
+
+武器由两部分构成：一是Weapons，二是Models，而这两者由Manufacturers链接。
+
+Weapons
+
+这代表武器本身的类型，包括武器的基本数据和其3D网格模型。
+
+Base
+Name:显然，这是在游戏中和FCS中显示的此物品的名称。
+Object Type:此物品是何类型（WEAPON）。这个属性不能改变。
+String ID:String ID对于每个物品是惟一的，不可能有两种物品共享同一个String ID。若物品已经存在于游戏世界中或物品被另一mod引用，千万不要更改这个属性，否则这些引用都会消失。通常来说，只有刚刚创建的物品的此属性能被更改。译注：String ID属性在FCS中的说明和英文Wiki中说明有所不同，本处按FCS中的说明翻译。
+
+（经验之谈：除了那些你犯了巨大错误的场合，你或许永不需要改变String ID。）
+
+Damage
+
+这些属性决定了这个武器造成的伤害。此分类下所有属性均影响伤害，但这些属性对于不同类型的武器重要程度有所不同。
+
+blunt damage multiplier [0.0 - 2.0]:钝器伤害系数，代表武器的重量，会与人物数据相乘决定重武器伤害。该数据乘1为Mk I品质武器钝器伤害系数，该数据乘2为铭刃钝器伤害系数。
+cut damage multiplier [0.5 - 1.5]:切割伤害系数，此乘数会与人物的攻击数据相乘，决定剑类武器的伤害。该数据乘1介于开顿城3号品质与Mk I品质之间，该数据乘2.2为铭刃切割伤害系数.
+minimum cut damage multiplier：决定最小伤害（当伤害小于此值时会强行设为此值）。这个属性对于Mod制作新手很有用。
+pierce damage multiplier [0.5 - 1.5]:此乘数会与人物的攻击数据相乘，决定剑类武器的伤害。
+Files
+
+这些属性决定物品的3D模型，网格等。
+
+bare sword: 仅包含武器，没有鞘。 (网格文件)
+icon: 物品在物品栏中显示的图标。 (png文件)
+mesh: 物品网格，若是武器则需包含鞘。 (网格文件))
+physics file: 物品被扔下状态的物理碰撞数据。 (xml文件)
+sheath: 仅包含鞘，没有武器。 (网格文件)
+Inventory
+auto icon image [true-false]: 对武器来说没什么用。
+inventory footprint height: 物品栏中物品的高度（单位为网格数）。
+inventory footprint width: 物品栏中物品的宽度（单位为网格）。
+value: 物品的价值。
+weight kg: 武器的最小重量。注意：武器的重量会被blunt damage multiplier属性决定（1.0 = 40kg），此属性仅决定最小重量。
+Inventory icon
+
+这些属性决定物品的图标如何显示。
+
+icon offset H: 图标水平对齐偏移。
+icon offset V: 图标垂直对齐偏移。
+icon zoom: 图标缩放程度。此值越小，图标越大。
+Models
+
+这些数据包含着武器贴图和武器数据的乘数。它们也能调整武器大小。
+
+Manufacturers
+
+每个Manufacturer包含着一个weapons列表和一个models列表。这两个列表中元素的任意一种组合均是一种可以出现在游戏中的武器。Manufacturers也包含着一系列武器数据乘数。

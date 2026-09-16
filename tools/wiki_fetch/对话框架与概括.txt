@@ -1,0 +1,140 @@
+这篇文章需要扩展。你可以帮助Kenshi来扩写它。
+
+本页面部分内容来自Dialogue Modding Guide: Structure Overlook和 fcs.def 文件（位于游戏目录）。
+
+对话框架
+General
+
+for enemies：如果为 true ，则与玩家敌对时此对话仍可触发。
+
+monologue（独白）：如果为 true ，且没有与玩家角色进行交谈，则所有的对话都由自己完成（即若想让 NPC 对话，该值不能为 true）。
+
+main
+
+chance permanent（永久概率）：决定该角色拥有该对话的概率，若没有该对话，则永远不会使用此对话。
+
+chance temporary（临时概率）：该角色使用该对话的概率，每次使用对话时都会进行概率判定。
+
+repetition limit（重复限制）：这个对话拥有冷却时间，在冷却时间内无法再此触发。
+
+DR_NO_LIMIT：无限制，DR_SHORT_2：2小时，DR_MEDIUM_6：6小时，DR_LONG_48：48小时，DR_ONCE_ONLY：仅触发一次，DR_VSHORT_020：20分钟
+
+score bonus（分数加成）：类似于优先级，数值大的优先触发。
+
+speaker：哪位角色在使用该对话。
+
+T_ME：角色自己，T_TARGET：正在与角色对话的目标，T_TARGET_IF_PLAYER：目标为玩家，T_INTERJECTOR1：插话者1，T_INTERJECTOR2：插话者2，T_INTERJECTOR3：插话者3，T_WHOLE_SQUAD：整个小队，T_TARGET_WITH_RACE：目标为某个种族
+
+target is type（目标类型）：此对话只应用于某种固定类型的角色。
+
+OT_NONE：无限制，OT_LAW_ENFORCEMENT：执法者，OT_MILITARY： 军事人员，OT_TRADER：商人，OT_CIVILIAN： 市民，OT_DIPLOMAT：拥有外交状态的角色，OT_SLAVE：奴隶，OT_SLAVER：奴隶贩子，OT_BANDIT： 土匪，OT_ADVENTURER：冒险家，OT_END：游戏中没有拥有此值的角色
+special
+
+locked：如果为 true ，则此对话只能在 unlocks 效果发生后使用。
+
+one at a time：如果为 true ，则同一时间只有一个 NPC 能触发这段对话。其目的是在特定事件中，避免一大群 NPC同时说出相同的台词。
+
+misc
+
+若使用帮助:查找官方汉化中的方法三导入官方文件，则该栏会出现英文原文。
+
+一般不使用。
+
+text
+
+该栏会显示对话。
+
+对话事件
+
+请参阅对话事件。
+
+对话条件
+
+请参阅对话条件。
+
+对话效果
+
+请参阅对话效果。
+
+词句交换
+
+请参阅对话中的词句交换。
+
+不同颜色的强调文本
+地区对话
+条件、效果补充
+AI contract
+
+激活指定的 AI 包作为一个合约， val0 为合约持续的小时数。
+
+change AI
+
+永久更改 AI 包，但不影响 AI 合约。需要注意的是，这里更改的 AI 不仅仅只是对话的人，而是他所属的整个队伍、奴隶甚至奴隶主。可以先使用 DA_SEPARATE_TO_OWN_SQUAD 把对方从自己的队伍中分离出来。
+
+change relations
+
+调整玩家派系与特定派系的关系，使用正数增加或负数减少。不能改变 NPC 的派系之间的关系。
+
+crowd trigger
+
+所有队伍成员同时触发这个对话.一般用于群体欢呼、大笑和战争呐喊。通常是一句台词。val0 为小队成员触发的百分比。
+
+所有符合条件的小队成员都会触发这段对话，即使他们的对话包里没有这个对话。
+
+如果不想要小队领袖触发，可以设置 "DC_IS_LEADER =0" 的对话条件。
+
+give item
+
+凭空指定物品交给目标。
+
+即使物品是给了 NPC，也会向玩家显示已收到物品的通知。
+
+只能 NPC 给玩家，没办法玩家给 NPC，NPC 之间可以互相给于。
+
+通过修改 fcs.def 文件几乎可以获得任何物品。
+
+has package
+
+说话者是否拥有指定的特殊对话包，除非这是一个插话的节点。
+
+这里需要注意说话者指的并不是这句话是谁说的，而是这个对话包是属于谁的。但如果是插话节点就看节点属于谁。
+
+in town of
+
+正处于某个阵营/派系旗下的城镇或基地内。
+
+interrupt
+Is character
+
+仅对说话者有效，指定说话者是哪位角色，常用于插话节点，比如玩家小队进入某一地区时触发的闲聊对话
+
+lock campaign
+locks
+my faction
+my race
+my subrace
+no target race
+target carrying character
+
+目标携带一个特定的角色触发 示例：扛着锡拳进联合城，武士们会惊讶
+
+target faction
+
+目标属于哪个特定阵营，对玩家无作用，通常用于对话包中 示例：当骨人角色击败一支圣国小队时会评价圣国
+
+target has item
+
+目标拥有指定物品才可触发 示例：玩家拥有神圣印章且与圣国结盟，即可解锁圣骑士保镖对话
+
+target has item type
+
+目标所拥有的物品类型，由item function中的值来决定，比如食物 书籍 工具等
+
+target face
+trigger campaign
+unlock but keep me
+unlock campaign
+unlocks
+world state
+
+根据世界状态触发，与某派系结盟 特定人物死亡/监禁后触发 示例：玩家与反蓄奴者结盟后，武士在攻击前会称其为反奴隶主斗士

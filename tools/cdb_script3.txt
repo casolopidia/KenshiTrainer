@@ -1,0 +1,5 @@
+.echo ====RE_STRING====
+db 0874bf40 L40
+.echo ====RE_STRING2====
+db 0874bff8 L40
+q

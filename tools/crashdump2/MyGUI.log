@@ -1,0 +1,101 @@
+11:49:18  |  Platform  |  Info  |  * Initialise: RenderManager  |  ..\..\..\..\Platforms\Ogre\OgrePlatform\src\MyGUI_OgreRenderManager.cpp  |  75
+11:49:18  |  Platform  |  Info  |  RenderManager successfully initialized  |  ..\..\..\..\Platforms\Ogre\OgrePlatform\src\MyGUI_OgreRenderManager.cpp  |  109
+11:49:18  |  Platform  |  Info  |  * Initialise: DataManager  |  ..\..\..\..\Platforms\Ogre\OgrePlatform\src\MyGUI_OgreDataManager.cpp  |  27
+11:49:18  |  Platform  |  Info  |  DataManager successfully initialized  |  ..\..\..\..\Platforms\Ogre\OgrePlatform\src\MyGUI_OgreDataManager.cpp  |  35
+11:49:18  |  Core  |  Info  |  * Initialise: Gui  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_Gui.cpp  |  63
+11:49:18  |  Core  |  Info  |  * MyGUI version 3.2.3  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_Gui.cpp  |  68
+11:49:18  |  Core  |  Info  |  * Initialise: ResourceManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  32
+11:49:18  |  Core  |  Info  |  ResourceManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  40
+11:49:18  |  Core  |  Info  |  * Initialise: LayerManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_LayerManager.cpp  |  33
+11:49:18  |  Core  |  Info  |  LayerManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_LayerManager.cpp  |  41
+11:49:18  |  Core  |  Info  |  * Initialise: WidgetManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_WidgetManager.cpp  |  56
+11:49:18  |  Core  |  Info  |  WidgetManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_WidgetManager.cpp  |  90
+11:49:18  |  Core  |  Info  |  * Initialise: InputManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_InputManager.cpp  |  46
+11:49:18  |  Core  |  Info  |  InputManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_InputManager.cpp  |  66
+11:49:18  |  Core  |  Info  |  * Initialise: SubWidgetManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_SubWidgetManager.cpp  |  36
+11:49:18  |  Core  |  Info  |  SubWidgetManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_SubWidgetManager.cpp  |  56
+11:49:18  |  Core  |  Info  |  * Initialise: SkinManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_SkinManager.cpp  |  36
+11:49:18  |  Core  |  Info  |  SkinManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_SkinManager.cpp  |  46
+11:49:18  |  Core  |  Info  |  * Initialise: FontManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_FontManager.cpp  |  32
+11:49:18  |  Core  |  Info  |  FontManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_FontManager.cpp  |  42
+11:49:18  |  Core  |  Info  |  * Initialise: ColourManager  |  ..\..\MyGUIEngine\src\MyGUI_ColourManager.cpp  |  31
+11:49:18  |  Core  |  Info  |  ColourManager successfully initialized  |  ..\..\MyGUIEngine\src\MyGUI_ColourManager.cpp  |  35
+11:49:18  |  Core  |  Info  |  * Initialise: ControllerManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ControllerManager.cpp  |  33
+11:49:18  |  Core  |  Info  |  ControllerManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ControllerManager.cpp  |  42
+11:49:18  |  Core  |  Info  |  * Initialise: PointerManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_PointerManager.cpp  |  43
+11:49:18  |  Core  |  Info  |  PointerManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_PointerManager.cpp  |  62
+11:49:18  |  Core  |  Info  |  * Initialise: ClipboardManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ClipboardManager.cpp  |  32
+11:49:18  |  Core  |  Info  |  ClipboardManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ClipboardManager.cpp  |  39
+11:49:18  |  Core  |  Info  |  * Initialise: LayoutManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_LayoutManager.cpp  |  28
+11:49:18  |  Core  |  Info  |  LayoutManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_LayoutManager.cpp  |  35
+11:49:18  |  Core  |  Info  |  * Initialise: DynLibManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_DynLibManager.cpp  |  26
+11:49:18  |  Core  |  Info  |  DynLibManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_DynLibManager.cpp  |  30
+11:49:18  |  Core  |  Info  |  * Initialise: PluginManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_PluginManager.cpp  |  30
+11:49:18  |  Core  |  Info  |  PluginManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_PluginManager.cpp  |  34
+11:49:18  |  Core  |  Info  |  * Initialise: LanguageManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_LanguageManager.cpp  |  31
+11:49:18  |  Core  |  Info  |  LanguageManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_LanguageManager.cpp  |  35
+11:49:18  |  Core  |  Info  |  * Initialise: FactoryManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_FactoryManager.cpp  |  25
+11:49:18  |  Core  |  Info  |  FactoryManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_FactoryManager.cpp  |  27
+11:49:18  |  Core  |  Info  |  * Initialise: ToolTipManager  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ToolTipManager.cpp  |  33
+11:49:18  |  Core  |  Info  |  ToolTipManager successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ToolTipManager.cpp  |  45
+11:49:18  |  Core  |  Info  |  Gui successfully initialized  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_Gui.cpp  |  116
+11:49:18  |  Core  |  Info  |  Load ini file 'core_layer.xml'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  114
+11:49:18  |  Core  |  Info  |  Load ini file 'common_skins.xml'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  114
+11:49:18  |  Core  |  Info  |  Load ini file 'kenshi_skins.xml'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  114
+11:49:18  |  Core  |  Info  |  Load ini file 'kenshi_colours.xml'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  114
+11:49:18  |  Core  |  Info  |  Load ini file 'kenshi_images.xml'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  114
+11:49:18  |  Core  |  Info  |  Load ini file 'kenshi_pointers.xml'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  114
+11:49:18  |  Core  |  Info  |  Load ini file 'core_settings.xml'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  114
+11:49:18  |  Core  |  Info  |  Load ini file 'kenshi_templates.xml'  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceManager.cpp  |  114
+11:49:19  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Small' using texture size 1024 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:49:19  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Small' using real height 16 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:49:20  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_MediumSmall' using texture size 1024 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:49:20  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_MediumSmall' using real height 19 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:49:20  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Medium' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:49:20  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Medium' using real height 24 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:49:20  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Large' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:49:20  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Large' using real height 27 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:49:21  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Small' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:49:21  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Small' using real height 24 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:49:21  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Medium' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:49:21  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Medium' using real height 29 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:49:22  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Large' using texture size 2048 x 4096.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:49:22  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Large' using real height 33 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:49:23  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_BannerTextFont' using texture size 8192 x 16384.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:49:23  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_BannerTextFont' using real height 153 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:49:23  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Small' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:49:23  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Small' using real height 24 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:49:24  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Medium' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:49:24  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Medium' using real height 25 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:49:24  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Large' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:49:24  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Large' using real height 27 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:49:25  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_UI_Messages' using texture size 8192 x 8192.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:49:25  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_UI_Messages' using real height 112 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:49:27  |  Core  |  Warning  |  Widget property 'FontName' not found [Kenshi_NewGamePanel.layout]  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_Widget.cpp  |  1210
+11:49:27  |  Core  |  Warning  |  Widget property 'WordWrap' not found [Kenshi_NewGamePanel.layout]  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_Widget.cpp  |  1210
+11:49:27  |  Core  |  Warning  |  Widget property 'Static' not found [Kenshi_NewGamePanel.layout]  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_Widget.cpp  |  1210
+11:49:27  |  Core  |  Warning  |  Widget property 'Snap' not found []  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_Widget.cpp  |  1210
+11:49:28  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_BannerTextFont' using texture size 8192 x 8192.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:49:28  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_BannerTextFont' using real height 119 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:49:28  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Large' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:49:28  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Large' using real height 26 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:49:28  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Medium' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:49:28  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Medium' using real height 25 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:49:29  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Small' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:49:29  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_FloaterFont_Small' using real height 24 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:49:29  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Large' using texture size 2048 x 4096.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:49:29  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Large' using real height 31 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:49:29  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Medium' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:49:29  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Medium' using real height 27 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:49:30  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Small' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:49:30  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_PaintedTextFont_Small' using real height 24 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:49:30  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Large' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:49:30  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Large' using real height 26 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:49:30  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Medium' using texture size 2048 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:49:30  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Medium' using real height 24 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:49:31  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_MediumSmall' using texture size 2048 x 1024.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:49:31  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_MediumSmall' using real height 19 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:49:31  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Small' using texture size 1024 x 2048.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:49:31  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_StandardFont_Small' using real height 16 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623
+11:49:32  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_UI_Messages' using texture size 8192 x 4096.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  622
+11:49:32  |  Core  |  Info  |  ResourceTrueTypeFont: Font 'Kenshi_UI_Messages' using real height 89 pixels.  |  C:\kenshi\kenshi-dependencies\mygui\MyGUIEngine\src\MyGUI_ResourceTrueTypeFont.cpp  |  623

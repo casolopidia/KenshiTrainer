@@ -1,0 +1,883 @@
+这篇文章刚刚完成，还需要进一步校对和完善。此处查看需要校对的词条列表。编辑者签名：艂舷。
+
+本页面内容参考了Dialogue Conditions & Effects 再次编辑：本页面内容采用了大量的反编译进行补充；部分内容仍然需要进一步检查。
+
+条件的基本结构
+
+FCS 中的普通对话条件可概括为：
+
+condition = {
+    condition_name,   // 选择 DC_* 条件
+    compare_by,       // =、< 或 >
+    who,              // ME、TARGET 等判断对象
+    value             // 数值阈值或布尔期望值
+};
+ID 决定使用哪个 DC_* 条件。
+who 指定普通条件的起始角色：T_ME 选择 ME，其他值统一选择 TARGET。部分条件会忽略 who，固定读取 ME、TARGET、小队、城镇或玩家阵营数据。
+value 对数值条件是阈值；对布尔条件则通常只看正负。
+同一条对话中的普通条件通常按 AND 组合：任意一个条件失败，该行就不会通过。
+Race、Faction、Personality 等独立列表通常在同一类别内按 OR、不同类别之间按 AND 处理。
+新版的 FCS 能搜索所有应用了某对话条件的对话。使用“condition name = X”在“Everything”处进行搜索，X 是该条件对应的数值。
+对话判断角色
+
+尽管枚举类型与 speaker 相同，普通条件中的 who 实际只区分两种情况：
+
+if (who == T_ME)
+    checkedCharacter = ME;
+else
+    checkedCharacter = TARGET;
+
+因此：
+
+T_ME：选择 ME。
+其他所有值：选择 TARGET。
+部分对话事件会依次尝试不同的玩家角色作为 TARGET；任意一名角色独立通过整组条件时，对话即可触发。
+比较符并不统一
+类型	条件	实际含义
+严格数值比较	ID 10=DC_FACTION_RANK、12=DC_PLAYER_TECH_LEVEL、13=DC_NUM_DIALOG_EVENT_REPEATS、35=DC_SQUAD_SIZE、37=DC_NUM_BACKPACKS、73=DC_TOWN_LEVEL_CURRENT_LOCATION、74=DC_PLAYERS_BEST_TOWN_LEVEL	=、<、> 分别是严格的 ==、<、>。
+门槛数值比较	ID 1=DC_RELATIONS、2=DC_PLAYERMONEY、3=DC_REPUTATION、18=DC_TARGET_LAST_SEEN_X_HOURS_AGO、40=DC_BOUNTY_AMOUNT_PERCEIVED、47=DC_BOUNTY_AMOUNT_ACTUAL	只有 < 是严格小于；= 与 > 都表示 >=。
+布尔条件	大多数状态条件	比较符通常被忽略；value > 0 要求为真，value <= 0 要求为假。
+特殊掩码	ID 23=DC_HAS_TAG、26=DC_PERSONALITY_TAG	在普通数值条件循环之外整理成必须拥有／必须排除的位掩码。
+失效或废弃	ID 0=DC_NONE、6=DC_FACTION_VARIABLE、15=DC_IMPRISONMENT_IS_DEATHROW、34=NULL_NULL_____DC_TARGET_SQUAD_SIZE	无正常业务判断，不应在新 Mod 中使用。
+
+精确等于门槛值的写法：对于门槛数值条件，要判断恰好等于 N，可同时添加 = N 与 < N+1。
+
+B
+Bounty_Amount_Actual
+
+中文名称： 实际赏金
+
+内部名： DC_BOUNTY_AMOUNT_ACTUAL
+ID： 47
+条件类型： 门槛数值比较
+作用： 读取目标角色真实记录的赏金金额。
+判断角色： 由 who 选择目标角色实际赏金。
+Bounty_Amount_Perceived
+
+中文名称： 感知到的赏金
+
+内部名： DC_BOUNTY_AMOUNT_PERCEIVED
+ID： 40
+条件类型： 门槛数值比较
+作用： 读取当前观察者或阵营语境下感知到的赏金。
+判断角色： 由 who 选择赏金主体；赏金的观察者／法律语境来自当前对话环境。
+数据来源： 在当前观察者/阵营语境下感知到的赏金
+Broken_Arm
+
+中文名称： 手臂失去行动能力
+
+内部名： DC_BROKEN_ARM
+ID： 28
+条件类型： 布尔条件
+作用： 检查任意一条手臂是否已经无法正常使用。
+判断角色/数据来源： 由 who 选择条件角色的左右臂。
+Broken_Leg
+
+中文名称： 腿部失去行动能力
+
+内部名： DC_BROKEN_LEG
+ID： 27
+条件类型： 布尔条件
+作用： 检查任意一条腿是否已经低于可正常使用的阈值。
+判断角色/数据来源： 由 who 选择条件角色的左右腿。
+Building_Is_Closed_And_Secured
+
+中文名称： 建筑关闭并封锁
+
+内部名： DC_BUILDING_IS_CLOSED_AND_SECURED
+ID： 11
+条件类型： 布尔条件
+作用： 检查关联建筑是否处于关闭、私人或封锁状态。
+判断角色/数据来源： 固定检查 ME 所关联的建筑；who 不改变建筑来源。
+使用提示： 该条件依赖有效的建筑上下文；在普通野外对话中可能没有可检查的建筑。私人建筑无法进行交易。
+C
+Can_Afford_Bounty
+
+中文名称： 能够支付赏金
+
+内部名： DC_CAN_AFFORD_BOUNTY
+ID： 66
+条件类型： 布尔条件
+作用： 计算当前适用赏金，并检查玩家资金是否足以支付。
+判断角色/数据来源： 赏金主体固定为当前 TARGET，资金固定读取玩家阵营；who 不参与。
+Carrying_Bounty_Alive
+
+中文名称： 携带存活悬赏犯
+
+内部名： DC_CARRYING_BOUNTY_ALIVE
+ID： 4
+条件类型： 布尔条件
+作用： 检查指定角色是否正携带一个仍然存活、且在当前法律语境下可作为悬赏目标交付的角色。
+判断角色： 由 who 选择携带者，随后检查该角色肩上携带的人。
+数据来源： 条件角色所携带的角色
+Carrying_Bounty_Dead
+
+中文名称： 携带死亡悬赏犯
+
+内部名： DC_CARRYING_BOUNTY_DEAD
+ID： 5
+条件类型： 布尔条件
+作用： 检查指定角色是否正携带一个已经死亡、且可作为悬赏目标交付的角色。
+判断角色： 由 who 选择携带者，随后检查该角色肩上携带的人。
+数据来源： 条件角色所携带的角色
+Carrying_Someone_To_Enslave
+
+中文名称： 携带待奴役角色
+
+内部名： DC_CARRYING_SOMEONE_TO_ENSLAVE
+ID： 46
+条件类型： 布尔条件
+作用： 检查角色携带的对象是否符合当前阵营的奴役目标过滤。
+判断角色： 由 who 选择携带者，再检查其肩上角色是否属于可被奴役目标。
+数据来源： 条件角色携带的角色与 ME/阵营 AI
+Cops_Around
+
+中文名称： 附近有执法者
+
+内部名： DC_COPS_AROUND
+ID： 33
+条件类型： 布尔条件
+作用： 检查 ME 已感知到的周围角色中是否存在执法者或权威人物。
+判断角色/数据来源： 固定使用 ME 的感知缓存搜索附近执法者；who 不参与。
+D
+Damaged_Head
+
+中文名称： 头部严重受损
+
+内部名： DC_DAMAGED_HEAD
+ID： 29
+条件类型： 布尔条件
+作用： 检查头部派生生命是否已经低于 20%。
+判断角色/数据来源： 由 who 选择目标角色的头部派生生命。
+使用提示： 实际阈值为头部派生生命低于约 20%，并非只要头部受过伤就为真。
+F
+Faction_Rank
+
+中文名称： 在当前阵营中的阶级
+
+内部名： DC_FACTION_RANK
+ID： 10
+条件类型： 严格数值比较
+作用： 检查玩家在 ME 所属阵营中的阶级值。
+判断角色： 固定使用 ME 的所属阵营；who 与 TARGET 不影响结果。
+数据来源： ME → 所属阵营 → 关系 → 角色等级
+使用提示： 该数值表示玩家在 ME 所属阵营中的阶级，是玩家阵营共享的全局数据，不属于某一个玩家角色。
+补充说明： 阵营记录可以定义阶级名称，但本条件比较的是内部整数值，而不是阶级名称文本。联合城定义了 -5～7 的阶级范围；忍者小偷的忍者商人（角色）对话使用了该条件。
+Faction_Variable
+
+中文名称： 阵营变量（失效）
+
+内部名： DC_FACTION_VARIABLE
+ID： 6
+条件类型： 失效／废弃
+补充说明： 未发现有效的阵营变量读取分支，不建议在 Mod 中使用。
+H
+Has_A_Base_Nearby
+
+中文名称： 附近存在基地
+
+内部名： DC_HAS_A_BASE_NEARBY
+ID： 60
+条件类型： 布尔条件
+作用： 检查相关阵营是否在指定位置附近拥有基地。
+判断角色： 以由 who 选出的角色当前位置为搜索中心；基地所属阵营由当前对话／阵营语境决定。
+数据来源： 相关阵营基地与条件位置
+使用提示： 距离阈值使用游戏内部坐标单位，不应未经实测直接换算为米。
+Has_AI_Contract
+
+中文名称： 拥有 AI 合约
+
+内部名： DC_HAS_AI_CONTRACT
+ID： 78
+条件类型： 布尔条件
+作用： 检查 ME 当前是否持有有效的 AI 合同或合约对象。
+判断角色/数据来源： 固定检查 ME 的 AI 合约。
+Has_Illegal_Item
+
+中文名称： 携带违禁品
+
+内部名： DC_HAS_ILLEGAL_ITEM
+ID： 69
+条件类型： 布尔条件
+作用： 按当前阵营或城镇贸易文化检查目标是否携带违禁品。
+判断角色： 由 who 选择起始角色；运行时可能继续扫描其所属小队中的相关成员。
+数据来源： 被扫描角色的直接库存，以及 ME／当前城镇对应的贸易文化。
+使用提示： 违禁品由当前阵营或城镇的贸易文化决定；通常不会递归检查背包内部物品，并可能触发走私反馈。
+Has_Robot_Limbs
+
+中文名称： 拥有机器人肢体
+
+内部名： DC_HAS_ROBOT_LIMBS
+ID： 79
+条件类型： 布尔条件
+作用： 检查角色本体或四肢是否具有假肢特征。
+判断角色/数据来源： 由 who 选择条件角色的种族或四肢。
+使用提示： 不仅检查假肢；骨人种族也可能使该条件为真；不会检查物品栏和背包是否有假肢。
+Has_Tag
+
+中文名称： 长期角色记忆标签
+
+内部名： DC_HAS_TAG
+ID： 23
+条件类型： 特殊掩码
+作用： 检查目标是否拥有或不拥有指定的长期角色记忆标签。
+判断角色/数据来源： 固定检查 ME 对当前 TARGET 保存的长期记忆标签；who 不参与普通角色选择。
+使用提示： 该条件会被整理为必须拥有／必须排除的标签掩码，不按普通布尔条件处理。
+
+长期记忆标签：
+
+LT_NONE：无标签
+LT_MY_INTRUDER：被记录为我的入侵者
+LT_MY_LIFESAVER：救过我
+LT_FREED_ME：释放过我
+LT_STOLE_FROM_ME：偷过我的东西
+LT_MY_CAPTOR：曾经抓捕或囚禁我
+LT_FRIENDLY_AQUAINTANCE：友好熟人
+LT_DEFEATED_MY_SQUAD_ONCE：曾击败我的小队
+LT_SQUAD_LOST_TO_ME_ONCE：其小队曾被我击败
+LT_KILLED_MY_FRIEND：杀死过我的朋友
+LT_I_SCREWED_THIS_GUY：我曾坑害或出卖过此人
+LT_MAX：枚举结束标记，不作为实际标签
+I
+I_Hate_This_Guy
+
+中文名称： 讨厌目标
+
+内部名： DC_I_HATE_THIS_GUY
+ID： 53
+条件类型： 布尔条件
+作用： 检查 ME 是否基于角色记忆讨厌 TARGET。
+判断角色/数据来源： 固定读取 ME 对 TARGET 的个人关系记忆。
+使用提示： 独立于派系关系的判定
+I_Love_This_Guy
+
+中文名称： 喜欢目标
+
+内部名： DC_I_LOVE_THIS_GUY
+ID： 52
+条件类型： 布尔条件
+作用： 检查 ME 是否基于角色记忆喜欢 TARGET。
+判断角色/数据来源： 固定读取 ME 对 TARGET 的个人关系记忆。
+使用提示： 独立于派系关系的判定
+I_Should_Help_This_Guy
+
+中文名称： 倾向帮助目标
+
+内部名： DC_I_SHOULD_HELP_THIS_GUY
+ID： 55
+条件类型： 布尔条件
+作用： 调用 ME 的复合 AI 判断，检查是否倾向帮助 TARGET。
+判断对象／数据来源： 固定 ME 判断是否应帮助或针对 TARGET。
+I_Should_Screw_This_Guy_Over
+
+中文名称： 倾向坑害目标
+
+内部名： DC_I_SHOULD_SCREW_THIS_GUY_OVER
+ID： 54
+条件类型： 布尔条件
+作用： 调用 ME 的复合 AI 判断，检查是否倾向坑害 TARGET。
+判断对象／数据来源： 固定 ME 判断是否应帮助或针对 TARGET。
+Im_Unarmed
+
+中文名称： 无可用武器
+
+内部名： DC_IM_UNARMED
+ID： 48
+条件类型： 布尔条件
+作用： 检查由 who 选中的角色是否被 AI 判定为没有可用武器。
+判断角色： 由 who 选择角色。
+数据来源： 所选角色的 AI 可用武器判断。
+判断过程： 非动物角色会检查装备武器、当前使用的武器，以及 AI 物品候选集合中能够使用的 ITEM_WEAPON；动物使用单独的自然武器状态判断。当前武器是弩时，仍然会执行检查，确定是否存在弩箭。
+补充说明： 原有“无武装包括不能穿戴护甲”的说法暂未找到代码依据，不应作为确定结论。该条目待进一步验证。
+Imprisoned_By_Other
+
+中文名称： 被其他人囚禁
+
+内部名： DC_IMPRISONED_BY_OTHER
+ID： 8
+条件类型： 布尔条件
+作用： 检查角色是否被 TARGET 以外的一方囚禁。
+判断角色： 由 who 选择被囚禁者；用于比较的监禁者固定为当前 TARGET。
+数据来源： 被囚禁角色、牢笼或监狱的所有者，以及 TARGET 所属阵营
+Imprisoned_By_Target
+
+中文名称： 被目标囚禁
+
+内部名： DC_IMPRISONED_BY_TARGET
+ID： 7
+条件类型： 布尔条件
+作用： 检查角色是否被 TARGET 所属一方囚禁。
+判断角色： 由 who 选择被囚禁者；用于比较的监禁者固定为当前 TARGET。
+数据来源： 被囚禁角色、牢笼/监狱所有者与 TARGET
+Imprisonment_Is_Deathrow
+
+中文名称： 死刑监禁（失效）
+
+内部名： DC_IMPRISONMENT_IS_DEATHROW
+ID： 15
+条件类型： 失效／废弃
+补充说明： 未发现有效的死刑监禁判定分支，不建议使用。
+In_A_Non_Player_Town
+
+中文名称： 位于非玩家城镇
+
+内部名： DC_IN_A_NON_PLAYER_TOWN
+ID： 31
+条件类型： 布尔条件
+作用： 检查角色当前是否位于一个有效的非玩家城镇。
+判断角色/数据来源： 由 who 选择角色，再检查该角色当前所在的城镇。
+In_A_Player_Town
+
+中文名称： 位于玩家城镇
+
+内部名： DC_IN_A_PLAYER_TOWN
+ID： 75
+条件类型： 布尔条件
+作用： 检查角色当前是否位于玩家所有的城镇。
+判断角色/数据来源： 由 who 选择角色，再检查其所在城镇是否属于玩家。
+In_Combat
+
+中文名称： 处于战斗状态
+
+内部名： DC_IN_COMBAT
+ID： 56
+条件类型： 布尔条件
+作用： 检查角色当前是否处于战斗模式。
+判断角色/数据来源： 由 who 选择条件角色。
+In_My_Building
+
+中文名称： 目标位于我的建筑
+
+内部名： DC_IN_MY_BUILDING
+ID： 17
+条件类型： 布尔条件
+作用： 检查 TARGET 是否位于 ME 所关联的同一栋建筑中。
+判断角色： 建筑来源固定为 ME，室内位置固定检查当前 TARGET；who 不参与。
+数据来源： ME 所属/关联建筑与 TARGET 所在室内建筑
+使用提示： 要求 TARGET 位于 ME 所关联的同一栋建筑内，而不是仅要求双方都在室内。
+Is_A_Trader
+
+中文名称： 商人身份
+
+内部名： DC_IS_A_TRADER
+ID： 9
+条件类型： 布尔条件
+作用： 检查角色当前是否被游戏认定为商人。
+判断角色/数据来源： 由 who 选择条件角色。
+Is_Ally
+
+中文名称： 盟友
+
+内部名： DC_IS_ALLY
+ID： 24
+条件类型： 布尔条件
+作用： 检查 ME 与 TARGET 在运行时是否被判定为盟友。
+判断角色/数据来源： 判断方固定为 ME 所属阵营；who 选择被判断角色。普通用法通常设置为 T_TARGET。双方属于同一阵营、存在显式 alliance 标记，或阵营关系值大于等于 50 时为真。
+Is_Dead
+
+中文名称： 死亡
+
+内部名： DC_IS_DEAD
+ID： 44
+条件类型： 布尔条件
+作用： 检查角色是否已经死亡。
+判断角色/数据来源： 由 who 选择条件角色。
+Is_Enemy
+
+中文名称： 敌人
+
+内部名： DC_IS_ENEMY
+ID： 25
+条件类型： 布尔条件
+作用： 检查 ME 与 TARGET 在运行时是否被判定为敌人。
+判断角色/数据来源： 判断方固定为 ME 所属阵营；who 选择被判断角色。普通用法通常设置为 T_TARGET。双方阵营关系值小于等于 -30 时为真。
+Is_Escaped_Slave
+
+中文名称： 逃奴或前奴隶
+
+内部名： DC_IS_ESCAPED_SLAVE
+ID： 62
+条件类型： 布尔条件
+作用： 检查角色是否处于逃奴或前奴隶状态。
+判断角色/数据来源： 由 who 选择条件角色的 SlaveStateEnum。
+使用提示： 运行时包括 ESCAPING_SLAVE 与 EX_SLAVE ，范围比名称“逃跑的奴隶”更宽。
+Is_Female
+
+中文名称： 女性
+
+内部名： DC_IS_FEMALE
+ID： 45
+条件类型： 布尔条件
+作用： 检查角色是否被游戏判定为女性。
+判断角色/数据来源： 由 who 选择条件角色。
+Is_Imprisoned
+
+中文名称： 处于监禁状态
+
+内部名： DC_IS_IMPRISONED
+ID： 14
+条件类型： 布尔条件
+作用： 检查角色是否真正处于牢笼或监狱模式。
+判断角色/数据来源： 由 who 选择条件角色。
+Is_In_Locked_Cage
+
+中文名称： 位于上锁的牢笼
+
+内部名： DC_IS_IN_LOCKED_CAGE
+ID： 63
+条件类型： 布尔条件
+作用： 检查角色是否被关在一个有效且已经上锁的牢笼中。
+判断角色/数据来源： 由 who 选择条件角色是否位于牢笼。
+Is_Indoors
+
+中文名称： 位于室内
+
+内部名： DC_IS_INDOORS
+ID： 68
+条件类型： 布尔条件
+作用： 检查角色当前是否具有有效的室内建筑句柄。
+判断角色/数据来源： 由 who 选择条件角色是否位于室内。
+Is_KO
+
+中文名称： 昏迷
+
+内部名： DC_IS_KO
+ID： 41
+条件类型： 布尔条件
+作用： 检查角色当前是否昏迷。
+判断角色/数据来源： 由 who 选择条件角色。
+Is_Leader
+
+中文名称： 小队领袖
+
+内部名： DC_IS_LEADER
+ID： 19
+条件类型： 布尔条件
+作用： 检查角色是否是其当前小队的领袖。
+判断角色/数据来源： 由 who 选择条件角色。
+Is_Nearly_KO
+
+中文名称： 濒临昏迷（重复条件）
+
+内部名： DC_IS_NEARLY_KO
+ID： 42
+条件类型： 布尔条件
+作用： 与 DC_NEARLY_KO 使用相同的内部医疗状态判断。
+判断角色： 由 who 选择目标角色。
+使用提示： 在之前的词条中提示已损坏，待检查中，请使用 DC_NEARLY_KO 代替。
+Is_Outnumbered
+
+中文名称： 寡不敌众
+
+内部名： DC_IS_OUTNUMBERED
+ID： 39
+条件类型： 布尔条件
+作用： 比较角色已感知敌人数与清醒盟友数，判断是否明显处于人数劣势。
+判断角色/数据来源： 由 who 选择角色，再使用该角色的感知与小队数据比较敌我人数。
+使用提示： 实际判断为：已感知敌人数 > 清醒盟友数 × 1.3。
+Is_Player
+
+中文名称： 玩家阵营角色
+
+内部名： DC_IS_PLAYER
+ID： 36
+条件类型： 布尔条件
+作用： 检查角色是否属于玩家阵营。
+判断角色/数据来源： 由 who 选择条件角色所属阵营。
+Is_Recruitable
+
+中文名称： 满足招募资格
+
+内部名： DC_IS_RECRUITABLE
+ID： 77
+条件类型： 布尔条件
+作用： 执行原版的复合招募资格检查。
+判断角色： 由 who 选择待判定招募资格的角色；正常用法通常是 T_TARGET。
+数据来源： TARGET、玩家阵营人数、TARGET 综合技能与角色状态
+使用提示： 这是复合招募资格判断（可招募条件)，至少包含玩家阵营人数上限、目标综合技能低于 25，以及若干角色状态过滤。
+
+
+
+
+Is_Running
+
+中文名称： 正在跑离
+
+内部名： DC_IS_RUNNING
+ID： 32
+条件类型： 布尔条件
+作用： 检查角色是否处于与当前对话对象相关的跑离状态。
+判断角色： 由 who 选择被检查角色；当选择 T_ME 时存在特殊运行路径。
+数据来源： 条件角色相对 ME 的移动状态
+使用提示： 其行为会受到 who 选择影响；并非单纯读取角色当前移动速度。
+
+
+
+
+Is_Same_Race_As_Me
+
+中文名称： 与我属于同一大种族
+
+内部名： DC_IS_SAME_RACE_AS_ME
+ID： 65
+条件类型： 布尔条件
+作用： 检查 ME 与 TARGET 是否属于同一宽泛种族。
+判断角色/数据来源： 固定比较 ME 与当前 TARGET；who 不参与。
+使用提示： 比较的是较宽泛的种族，通常无法区分具体亚种。
+Is_Slave
+
+中文名称： 奴隶状态
+
+内部名： DC_IS_SLAVE
+ID： 59
+条件类型： 布尔条件
+作用： 检查角色是否是奴隶或正在逃跑的奴隶。
+判断角色/数据来源： 由 who 选择条件角色。
+使用提示： IS_SLAVE 与 ESCAPING_SLAVE 都会被视为奴隶；EX_SLAVE 不包含在内。
+Is_Sneaking
+
+中文名称： 处于潜行状态
+
+内部名： DC_IS_SNEAKING
+ID： 67
+条件类型： 布尔条件
+作用： 检查角色是否开启潜行模式。
+判断角色/数据来源： 由 who 选择条件角色。
+M
+Met_Target_Before
+
+中文名称： 曾经见过目标
+
+内部名： DC_MET_TARGET_BEFORE
+ID： 20
+条件类型： 布尔条件
+作用： 检查 ME 是否在角色记忆中记录过 TARGET。
+判断角色/数据来源： 固定检查 ME 是否记得 TARGET。
+Mixed_Gender_Group
+
+中文名称： 小队包含不同性别
+
+内部名： DC_MIXED_GENDER_GROUP
+ID： 72
+条件类型： 布尔条件
+作用： 检查小队中是否同时存在女性和非女性成员。
+判断角色/数据来源： 由 who 选择角色，再检查其小队性别构成。
+使用提示： 要求小队中至少同时存在 1 名女性与 1 名非女性角色。
+My_Mission_Is_Friendly
+
+中文名称： 当前任务为友善任务
+
+内部名： DC_MY_MISSION_IS_FRIENDLY
+ID： 51
+条件类型： 布尔条件
+作用： 检查 ME 当前任务是否被内部逻辑判定为友善任务。
+判断角色/数据来源： 固定检查 ME 当前任务/战役状态。
+N
+Nearly_KO
+
+中文名称： 濒临昏迷
+
+内部名： DC_NEARLY_KO
+ID： 30
+条件类型： 布尔条件
+作用： 检查内部医疗状态是否低于濒临昏迷阈值。
+判断角色： 由 who 选择角色。
+数据来源： MedicalSystem 内部 restedState
+使用提示： 在 与 Is_Nearly_KO 使用同一段内部医疗状态判断。
+None
+
+中文名称： 空条件／占位
+
+内部名： DC_NONE
+ID： 0
+条件类型： 空条件／占位
+补充说明： 该项是空条件／占位项，在 没有正常业务判断，不建议使用。
+NULL_NULL_____DC_TARGET_SQUAD_SIZE
+
+中文名称： 废弃的目标小队人数槽
+
+内部名： NULL_NULL_____DC_TARGET_SQUAD_SIZE
+ID： 34
+条件类型： 失效／废弃
+使用提示： 未发现有效作用；真正的小队人数条件是 ID 35。
+Num_Backpacks
+
+中文名称： 小队背包数量
+
+内部名： DC_NUM_BACKPACKS
+ID： 37
+条件类型： 严格数值比较
+作用： 统计角色所在小队中实际装备背包的成员数量。
+判断角色/数据来源： 由 who 选择角色，再统计其小队装备的背包。
+Num_Dialogue_Event_Repeats
+
+中文名称： 对话事件重复次数
+
+内部名： DC_NUM_DIALOG_EVENT_REPEATS
+ID： 13
+条件类型： 严格数值比较
+作用： 检查当前对话事件已经重复触发的次数。
+判断角色/数据来源： 固定读取 ME 的 Dialogue 当前事件重复计数；who 不参与。
+P
+Personality_Tag
+
+中文名称： 性格标签
+
+内部名： DC_PERSONALITY_TAG
+ID： 26
+条件类型： 特殊掩码
+作用： 检查说话者是否符合指定性格标签。
+判断角色/数据来源： 固定检查 ME 的性格标签；who 不参与普通角色选择。
+使用提示： 该条件会被整理为性格标签掩码，不按普通数值条件处理。
+
+性格标签：
+
+PT_None：无指定性格
+PT_Honorable：高尚
+PT_Traitorous：反叛
+PT_Smart：聪慧
+PT_Dumb：愚笨
+PT_Brave：勇敢
+PT_Fearful：怯懦
+PT_Warm_Kind：温暖／仁慈，原版较少使用
+PT_Cold_Cruel：冷酷／残忍，原版较少使用
+PT_Normal：普通
+PT_Maniacal：疯狂
+PT_End：枚举结束标记，不作为实际性格
+Player_Tech_Level
+
+中文名称： 玩家科技等级
+
+内部名： DC_PLAYER_TECH_LEVEL
+ID： 12
+条件类型： 严格数值比较
+作用： 检查玩家阵营的整体科技等级，而非拥有几级
+研究工作台
+。
+判断角色/数据来源： 固定读取玩家科技等级。
+PlayerMoney
+
+中文名称： 玩家资金
+
+内部名： DC_PLAYERMONEY
+ID： 2
+条件类型： 门槛数值比较
+作用： 检查玩家阵营当前持有的开币。
+判断角色/数据来源： 固定读取玩家阵营资金。
+Players_Best_Town_Level
+
+中文名称： 玩家最高城镇等级
+
+内部名： DC_PLAYERS_BEST_TOWN_LEVEL
+ID： 74
+条件类型： 严格数值比较
+作用： 读取玩家拥有的所有城镇中最高的等级。
+判断角色/数据来源： 固定读取玩家最高城镇等级。
+R
+Relations
+
+中文名称： 关系值
+
+内部名： DC_RELATIONS
+ID： 1
+条件类型： 门槛数值比较
+作用： 检查当前对话语境中相关阵营之间的关系数值。
+判断角色/数据来源： 比较 ME 与由 who 选出的角色之间的关系；通常将 who 设为 T_TARGET。
+补充说明： 当值大于50时等效于 DC_IS_ALLY 返回 true。当值小于-30时等效于 DC_IS_ENEMY 返回 true。
+Reputation
+
+中文名称： 阵营声望
+
+内部名： DC_REPUTATION
+ID： 3
+条件类型： 门槛数值比较
+作用： 检查玩家对相关阵营的声望数值。
+判断角色/数据来源： 由 who 选出声望关联角色，并据此取得相关阵营；通常将 who 设为 T_TARGET。
+S
+Squad_Is_Down
+
+中文名称： 小队全部倒下
+
+内部名： DC_SQUAD_IS_DOWN
+ID： 43
+条件类型： 布尔条件
+作用： 检查角色所在小队是否整体失去行动能力。
+判断角色/数据来源： 由 who 选择角色，再检查该角色所属小队是否已整体倒下。
+Squad_Only_Animals
+
+中文名称： 小队仅由动物组成
+
+内部名： DC_SQUAD_ONLY_ANIMALS
+ID： 38
+条件类型： 布尔条件
+作用： 检查角色所在小队是否只包含动物。
+判断角色/数据来源： 由 who 选择角色，再检查其小队是否全为动物。
+补充说明： 用于 I_SEE 事件，当 NPC 发现玩家小队中只有动物角色时。这些 NPC 会自动加入玩家，即使所有类人角色都已死亡，也能使玩家的游戏继续。
+Squad_Size
+
+中文名称： 小队人数
+
+内部名： DC_SQUAD_SIZE
+ID： 35
+条件类型： 严格数值比较
+作用： 统计角色所在运行时小队中的有效成员数量。
+判断角色/数据来源： 由 who 选择目标角色，再统计其小队人数。
+Starving
+
+中文名称： 处于饥饿状态
+
+内部名： DC_STARVING
+ID： 71
+条件类型： 布尔条件
+作用： 检查角色内部饥饿值是否低于饥饿阈值（170）。
+判断角色： 由 who 选择目标角色。
+Stronger_Than_Me
+
+中文名称： 目标明显强于我
+
+内部名： DC_STRONGER_THAN_ME
+ID： 22
+条件类型： 布尔条件
+作用： 检查 TARGET 的内部战斗强度是否大于 ME 的 1.5 倍。
+判断角色： 固定比较 ME 与 TARGET；who 不参与。
+数据来源： 双方 StateBroadcastData 中缓存的战斗强度值。
+强度构成： 战斗强度由当前力量、攻击侧战斗值和防御侧战斗值取平均。力量及战斗值会受到伤势、装备修正和当前持械／徒手状态影响。对非动物角色，如果当前没有装备武器，最终战斗强度会乘以 0.1；动物不受这项修正。
+判断公式： TARGET强度 > ME强度 × 1.5
+使用提示： 该条件不是分别比较力量、武术或武器。双方会先各自计算一个综合值，再进行比例比较。
+边界说明： 使用严格大于判断。TARGET 恰好等于 ME 的 1.5 倍时仍为假。
+combatStrength = (current_strength + current_attack + current_defence) / 3.0;
+
+
+if (!character->isAnimal() && !character->inventory->hasWeaponEquipped())
+    combatStrength *= 0.1;
+T
+Target_Character_Exists
+
+中文名称： 目标角色存在
+
+内部名： DC_TARGET_CHARACTER_EXISTS
+ID： 76
+条件类型： 布尔条件
+作用： 检查当前对话是否具有有效 TARGET 角色。
+判断角色/数据来源： 固定检查 TARGET 是否存在。
+使用提示： 可用于在后续条件访问 TARGET 前确认目标对象确实存在。
+补充说明： 例如在领导者发表开战宣言时玩家是否出现。
+Target_In_Talking_Range
+
+中文名称： 目标处于交谈范围
+
+内部名： DC_TARGET_IN_TALKING_RANGE
+ID： 16
+条件类型： 布尔条件
+作用： 检查 TARGET 是否与 ME 处于可直接交谈的距离和内部楼层。
+判断角色/数据来源： 固定比较 ME 与 TARGET。
+使用提示： 双方必须位于相同内部楼层，且距离小于 260 个游戏内部单位。
+补充说明： 检查目标是否在附近，这样就不会与远处的人交谈。
+Target_Is_My_Mission_Target
+
+中文名称： 目标是当前任务目标
+
+内部名： DC_TARGET_IS_MY_MISSION_TARGET
+ID： 50
+条件类型： 布尔条件
+作用： 检查 TARGET 句柄是否等于 ME 当前任务目标句柄。
+判断角色/数据来源： 固定将当前 TARGET 与 ME 的任务目标进行比较；who 不参与。
+Target_Is_Slave_Of_My_Faction
+
+中文名称： 目标是我方奴隶
+
+内部名： DC_TARGET_IS_SLAVE_OF_MY_FACTION
+ID： 61
+条件类型： 布尔条件
+作用： 检查 TARGET 的奴隶所有者是否属于 ME 的阵营。
+判断角色/数据来源： 固定检查当前 TARGET 的奴隶所有者是否属于 ME 的阵营；who 不参与。
+Target_Last_Seen_X_Hours_Ago
+
+中文名称： 距上次见到目标的时间
+
+内部名： DC_TARGET_LAST_SEEN_X_HOURS_AGO
+ID： 18
+条件类型： 门槛数值比较
+作用： 检查 ME 的角色记忆中，距离上次见到 TARGET 已经过多少小时。
+判断角色： 固定读取 ME 对当前 TARGET 的最后见面记忆；who 不参与。
+使用提示： 只有在 ME 的角色记忆中存在 TARGET 记录时，该时间值才有意义。
+Town_Has_Fortification_Walls
+
+中文名称： 城镇拥有防御墙
+
+内部名： DC_TOWN_HAS_FORTIFICATIONS_WALLS
+ID： 49
+条件类型： 布尔条件
+作用： 检查当前城镇是否存在城墙、堡垒或相关防御设施。
+判断角色： 由 who 选择角色，再从该角色的当前位置取得城镇与防御设施。
+数据来源： 当前城镇的墙/门/防御设施对象
+使用提示： 运行时存在有效判断，但必须有当前城镇与对应防御设施上下文。
+Town_Level_Current_Location
+
+中文名称： 当前城镇等级
+
+内部名： DC_TOWN_LEVEL_CURRENT_LOCATION
+ID： 73
+条件类型： 严格数值比较
+作用： 读取角色当前所在城镇的等级。
+判断角色/数据来源： 由 who 选择角色，再读取其所在城镇等级。
+Town_Walls_Locked_Up
+
+中文名称： 城墙或大门已封锁
+
+内部名： DC_TOWN_WALLS_LOCKED_UP
+ID： 58
+条件类型： 布尔条件
+作用： 检查当前城镇的墙门是否处于锁闭或封锁状态。
+判断角色： 由 who 选择角色，再检查其所在城镇的封锁状态。
+数据来源： 条件角色当前城镇的墙门/锁状态
+U
+Using_My_Training_Equipment
+
+中文名称： 正在使用我方训练设施
+
+内部名： DC_USING_MY_TRAINING_EQUIPMENT
+ID： 70
+条件类型： 布尔条件
+作用： 检查 TARGET 是否正在使用属于 ME 或 ME 所属阵营的训练设施。
+判断角色/数据来源： 使用设施者为当前 TARGET；设施所有权与 ME 或 ME 所属阵营比较。
+使用提示： 训练设施需要属于 ME 或 ME 的阵营；仅仅“正在训练”并不足以通过。
+补充说明： 训练建筑必须与 ME 位于同一城镇，且该城镇的所有权必须与 ME 所属的派系相同；ME 需要与假人位于建筑物的同一侧（建筑物内或建筑物外），并且使用时 ME 必须目睹整个过程。
+W
+Weaker_Than_Me
+
+中文名称： 目标明显弱于我
+
+内部名： DC_WEAKER_THAN_ME
+ID： 21
+条件类型： 布尔条件
+作用： 检查 TARGET 的内部战斗强度是否大于 ME 的 1.5 倍。
+判断角色： 固定比较 ME 与 TARGET；who 不参与。
+判断公式： ME强度 > TARGET强度 × 1.5
+数据来源： 双方 StateBroadcastData 中缓存的战斗强度值。详细战斗强度值参见 DC_STRONGER_THAN_ME。
+使用提示： 该条件不是分别比较力量、武术或武器。双方会先各自计算一个综合值，再进行比例比较。
+Wearing_Locked_Shackles
+
+中文名称： 穿戴上锁的镣铐
+
+内部名： DC_WEARING_LOCKED_SHACKLES
+ID： 64
+条件类型： 布尔条件
+作用： 检查角色是否装备了已经上锁的镣铐。
+判断角色/数据来源： 由 who 选择条件角色穿戴的镣铐。
+Within_Town_Walls
+
+中文名称： 位于城墙范围内
+
+内部名： DC_WITHIN_TOWN_WALLS
+ID： 57
+条件类型： 布尔条件
+作用： 检查角色是否处于城镇防御墙内部区域。
+判断角色/数据来源： 由 who 选择条件角色。
+DC_END
+
+DC_END 是 DialogConditionEnum 的结束标记，不是可供对话使用的条件。
+
+内容声明
+反编译入口：Dialogue::_checkCondition，RVA 0x00675EC0。
+使用kenshi-steam-1.0.65版本。

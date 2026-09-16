@@ -1,0 +1,130 @@
+这篇文章需要改进。你可以帮助Kenshi来编辑它。
+
+以下是计算假肢数据所用的 Python 脚本。脚本早已写好，但之前一直没有整理成普通人易懂的文本，所以原本不打算发布。现在由于某些原因为了防止某些没有能力却想编写此页面的人来创建页面，所以先占坑。
+
+如果您想完善该页面，请以护甲数据的计算为模范。
+
+——SodaDrink01（留言） 2025年7月18日 (五) 18:50 (CST)
+
+# coding: utf-8
+# @Author: SodaDrink01
+grades = {"模本":5, "赝品":20, "标准":40, "高":60, "专家":80, "杰作":95}
+
+
+data = {
+    # "template": {"HP": (100, 300), "swimming": (0.75, 0.75), "unarmed": (0, 0), "dexterity": (1, 1), "ranged": (1, 1), "strength": (1, 1), "thievery": (0, 0.5), "athletics": (1, 1), "stealth": (1, 1)},
+    "Economy Arm (left)": {"HP": (35, 100), "swimming": (0.75, 0.75), "unarmed": (0, 0), "dexterity": (0.66, 0.8), "ranged": (0.6, 0.9), "strength": (0.66, 1), "thievery": (0, 0.5)},
+    "Economy Arm (right)": {"HP": (35, 100), "swimming": (0.75, 0.75), "unarmed": (0, 0), "dexterity": (0.66, 0.8), "ranged": (0.6, 0.9), "strength": (0.66, 1), "thievery": (0, 0.5)},
+    "Economy Leg (left)": {"HP": (35, 100), "swimming": (0.5, 0.5), "unarmed": (0, 0), "athletics": (0.1, 0.9), "stealth": (0.1, 0.9)},
+    "Economy Leg (right)": {"HP": (35, 100), "swimming": (0.5, 0.5), "unarmed": (0, 0), "athletics": (0.1, 0.9), "stealth": (0.1, 0.9)},
+    "Industrial Lifter Arm (left)": {"HP": (70, 200), "swimming": (0.6, 0.75), "unarmed": (0, 4), "dexterity": (0.6, 1), "ranged": (0.75, 1), "strength": (1, 1.25), "thievery": (0.5, 0.9)},
+    "Industrial Lifter Arm (right)": {"HP": (70, 200), "swimming": (0.6, 0.75), "unarmed": (0, 4), "dexterity": (0.6, 1), "ranged": (0.75, 1), "strength": (1, 1.25), "thievery": (0.5, 0.9)},
+    "KLR Series Arm (left)": {"HP": (100, 250), "swimming": (0.75, 0.75), "unarmed": (0, 5), "dexterity": (0.75, 1.1), "ranged": (0.75, 1), "strength": (0.75, 1.1), "thievery": (0.2, 0.95)},
+    "KLR Series Arm (right)": {"HP": (100, 250), "swimming": (0.75, 0.75), "unarmed": (0, 5), "dexterity": (0.75, 1.1), "ranged": (0.75, 1), "strength": (0.75, 1.1), "thievery": (0.2, 0.95)},
+    "KLR Series Leg (left)": {"HP": (100, 300), "swimming": (0.5, 0.5), "unarmed": (0, 0), "athletics": (0.4, 1), "stealth": (0.1, 0.5)},
+    "KLR Series Leg (right)": {"HP": (100, 300), "swimming": (0.5, 0.5), "unarmed": (0, 0), "athletics": (0.4, 1), "stealth": (0.1, 0.5)},
+    "Scout Leg (left)": {"HP": (50, 150), "swimming": (0.75, 1), "unarmed": (0, 0), "athletics": (1, 1.4), "stealth": (0.25, 0.95)},
+    "Scout Leg (right)": {"HP": (50, 150), "swimming": (0.75, 1), "unarmed": (0, 0), "athletics": (1, 1.4), "stealth": (0.25, 0.95)},
+    "Skeleton Arm (left)": {"HP": (50, 175), "swimming": (0.6, 0.75), "unarmed": (0, 4), "dexterity": (0.75, 1.25), "ranged": (0.75, 1), "strength": (0.75, 1), "thievery": (0.75, 0.9)},
+    "Skeleton Arm (right)": {"HP": (50, 175), "swimming": (0.6, 0.75), "unarmed": (0, 4), "dexterity": (0.75, 1.25), "ranged": (0.75, 1), "strength": (0.75, 1), "thievery": (0.75, 0.9)},
+    "Skeleton Leg (left)": {"HP": (50, 175), "swimming": (0.75, 0.75), "unarmed": (0, 0), "athletics": (0.4, 1.1), "stealth": (0.1, 0.6)},
+    "Skeleton Leg (right)": {"HP": (50, 175), "swimming": (0.75, 0.75), "unarmed": (0, 0), "athletics": (0.4, 1.1), "stealth": (0.1, 0.7)},
+    "Steady Arm (left)": {"HP": (50, 150), "swimming": (0.6, 0.75), "unarmed": (0, 0), "dexterity": (0.75, 1.2), "ranged": (0.75, 1.25), "strength": (0.75, 1), "thievery": (0.75, 1)},
+    "Stealth Leg (left)": {"HP": (50, 175), "swimming": (0.75, 0.75), "unarmed": (0, 0), "athletics": (0.7, 1.05), "stealth": (0.75, 1.25)},
+    "Stealth Leg (right)": {"HP": (50, 175), "swimming": (0.75, 0.75), "unarmed": (0, 0), "athletics": (0.7, 1.05), "stealth": (0.75, 1.25)},
+    "Thief's Arm (right)": {"HP": (50, 150), "swimming": (0.6, 0.85), "unarmed": (0, 0), "dexterity": (0.75, 1.2), "ranged": (0.75, 1), "strength": (0.75, 1), "thievery": (0.9, 1.25)},
+}
+
+
+def diff(tup:tuple):
+    return tup[1] - tup[0]
+
+
+def cal1(tup:tuple, grade):
+    return tup[0] + diff(tup) * grade / 100
+
+
+def cal2(tup:tuple, grade):
+    return -100 + 100 * tup[0] + diff(tup) * grade
+
+
+
+
+def f(x, tup):
+    if x <= 5:
+        return 0
+    elif 5 < x <= 40:
+        return (x - 5) * (100 - tup[0] * 100) / (40 - 5)
+    else:
+        return (100 - tup[0] * 100) + (tup[1] - 1) * 20 / 11 * (x - 40)
+
+
+
+
+def cal3(tup: tuple, grade):
+    result = -100 + 100 * tup[0]
+
+
+    if tup[1] < tup[0]:
+        raise Exception("tup[1] 必须大于等于 tup[0]")
+
+
+    if tup[0] >= 1 or tup[1] < 1:
+        result += diff(tup) * grade
+    else:
+        result += min(f(grade, tup), diff(tup) * 100)
+
+
+    return result
+
+
+def rounding(x):  # 求最接近 x 的 5 的倍数。由于浮点数精度问题，与游戏实际结果可能有±5的误差，以游戏内为准。
+    lower = int(x) // 5 * 5
+    upper = lower + 5
+    if x - lower <= upper - x:
+        return lower
+    else:
+        return upper
+
+
+
+
+def trim(s:str):
+    return s[:-4] + s[-4:].rstrip('0')
+
+
+def format_data(n):
+    if n == 0:
+        return ""
+    else:
+        return ("+" if n > 0 else "") + trim(f"{n:.6f}")
+
+
+
+
+if __name__ == "__main__":
+    name = "Economy Arm (right)"
+
+
+    for grade in grades.keys():
+        print(f"""
+|等级 = {grade}
+|最大生命值 = {rounding(cal1(data[name]["HP"], grades[grade]))}""")
+
+
+        if "Arm" in name:
+            print(f"""|十字弩 = {format_data(cal3(data[name]["ranged"], grades[grade]))}
+|撬锁 = {format_data(cal3(data[name]["thievery"], grades[grade]))}
+|偷窃 = {format_data(cal3(data[name]["thievery"], grades[grade]))}
+|灵巧性 = {format_data(cal3(data[name]["dexterity"], grades[grade]))}
+|力量 = {format_data(cal3(data[name]["strength"], grades[grade]))}""")
+
+
+        if "Leg" in name:
+            print(f"""|潜行 = {format_data(cal3(data[name]["stealth"], grades[grade]))}
+|奔跑 = {format_data(cal3(data[name]["athletics"], grades[grade]))}""")
+
+
+        print(f"""|游泳 = {format_data(cal2(data[name]["swimming"], grades[grade]))}
+|无武装伤害加成 = {format_data(cal1(data[name]["unarmed"], grades[grade]))}
+""")
