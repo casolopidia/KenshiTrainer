@@ -1427,7 +1427,7 @@ void DrawTrainerUI()
     ImGui::Begin(TR(APP_NAME), NULL,
         ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize |
         ImGuiWindowFlags_NoCollapse);
-    if (ImGui::Button(g_showMenu ? "\xE5\x85\xB3\xE9\x97\xAD\xE9\x9D\xA2\xE6\x9D\xBF" : "\xE5\xBC\x80\xE5\x90\xAF\xE9\x9D\xA2\xE6\x9D\xBF"))
+    if (ImGui::Button(g_showMenu ? TR(PANEL_CLOSE) : TR(PANEL_OPEN)))
     {
         g_showMenu = !g_showMenu;
         if (g_showMenu)
@@ -1481,11 +1481,10 @@ void DrawTrainerUI()
 
 static bool IsChineseLocaleId(const char* id, const char* sc, const wchar_t* nm);
 
-static bool DetectChineseUI()
+// returns true when the locale pointers were read; strings borrowed from the
+// game (valid until the locale manager changes them)
+static bool ReadGameLocale(const char** id, const char** sc, const wchar_t** nm)
 {
-    const char* id = NULL;
-    const char* sc = NULL;
-    const wchar_t* nm = NULL;
     __try
     {
         LocaleManager* lm = LocaleManager::getInstance();
@@ -1494,14 +1493,25 @@ static bool DetectChineseUI()
         LocaleInfo* cur = *(LocaleInfo**)((char*)lm + 0x78);
         if (!cur)
             return false;
-        id = ((const std::string*)((char*)cur + 0x8))->c_str();
-        nm = ((const std::wstring*)((char*)cur + 0x30))->c_str();
-        sc = ((const std::string*)((char*)cur + 0x58))->c_str();
+        *id = ((const std::string*)((char*)cur + 0x8))->c_str();
+        *nm = ((const std::wstring*)((char*)cur + 0x30))->c_str();
+        *sc = ((const std::string*)((char*)cur + 0x58))->c_str();
+        return true;
     }
     __except (EXCEPTION_EXECUTE_HANDLER) { return false; }
+}
 
+static bool DetectChineseUI()
+{
+    const char* id = NULL;
+    const char* sc = NULL;
+    const wchar_t* nm = NULL;
+    if (!ReadGameLocale(&id, &sc, &nm))
+        return false;
     if (!id)
         return false;
+    DebugLog(std::string("KenshiTrainer: locale id=") + id +
+             " steam=" + (sc ? sc : "?"));
     return IsChineseLocaleId(id, sc, nm);
 }
 

@@ -20,11 +20,36 @@ static bool g_buildBypass = false;
 
 static bool (*g_origPlacementVerification)(PreviewBuilding*) = NULL;
 
+// PreviewBuilding validity flag bytes (see kenshi/Building/Building.h; offsets
+// verified against this build's code): 0x88 collisionOK, 0x89 charactersOK,
+// 0x8A floorOk, 0x8B indoorsOK, 0x8C slopeOK, 0x8D nodesOk, 0x8E blocked
+// Buildings (inverted), 0x8F validGround. buildingPlacementUpdate() runs a
+// town-proximity check BEFORE calling placementVerification() and records the
+// outcome in the slopeOK byte, so forcing the return value alone is not enough
+// - the refusal path reads the flags. While the bypass is on we rewrite the
+// flags right after verification runs (per frame), which unblocks every
+// placement refusal incl. the near-town one.
+static void ForceValidFlags(PreviewBuilding* self)
+{
+    char* p = (char*)self;
+    p[0x88] = 1;
+    p[0x89] = 1;
+    p[0x8A] = 1;
+    p[0x8B] = 1;
+    p[0x8C] = 1;
+    p[0x8D] = 1;
+    p[0x8E] = 0;
+    p[0x8F] = 1;
+}
+
 static bool PlacementVerification_Hook(PreviewBuilding* self)
 {
     bool ok = g_origPlacementVerification(self);
     if (g_buildBypass)
+    {
+        ForceValidFlags(self);
         return true;
+    }
     return ok;
 }
 
