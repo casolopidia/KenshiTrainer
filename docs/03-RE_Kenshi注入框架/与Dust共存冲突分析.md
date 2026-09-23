@@ -25,9 +25,9 @@
 
 **次级风险（两 GUI 共存时）：** 我们的 ImGui 绘制流量（Map/DrawIndexed/VSSetShader 等）会穿过 Dust 的设备上下文 hook。Dust 按游戏着色器签名做分发，我们的 UI 绘制不匹配签名应 mostly 透传；但其逐绘制统计/调查记录会被污染，个别效果（如相机 CB 提取）理论上可能误判。Dust 对自己的 GUI 绘制有豁免，对外部 ImGui 没有。
 
-## 修复方案（待批准）
+## 修复方案（已批准，已实现 2026-09-23）
 
-给 Overlay 加 **shadow vtable 漂移重同步**：SCRec 记录活 vtable 指针，每次 Present（持帧锁）比对活表 8/13/22 槽与上次快照；发现外部改写（Dust 后装）则把活表重新拷入 shadow、重定向我们的槽、orig 更新为 late hooker 的 detour。效果：任意安装顺序都能链成 外层→内层→真实Present，Dust 不再静默失效。约 20 行，只动 Overlay.cpp。
+给 Overlay 加 **shadow vtable 漂移重同步**：SCRec 记录活 vtable 指针，每次 Present（持帧锁）比对活表 8/13/22 槽与上次快照；发现外部改写（Dust 后装）则把活表重新拷入 shadow、重定向我们的槽、orig 更新为 late hooker 的 detour。效果：任意安装顺序都能链成 外层→内层→真实Present，Dust 不再静默失效。已落地：Overlay.cpp 的 SCRec 记录活 vtable 指针与 8/13/22 槽快照，每次 Present（持帧锁）比对，漂移则重拷活表入 shadow、orig 更新为后装者 detour。日志出现 "shadow vtable resynced" 即命中场景 (3) 并被修复。
 
 ## 建议验证流程
 

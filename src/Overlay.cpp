@@ -302,7 +302,18 @@ static bool InitImGui(IDXGISwapChain* sc)
 typedef HRESULT(STDMETHODCALLTYPE* Present_t)(IDXGISwapChain*, UINT, UINT);
 typedef HRESULT(STDMETHODCALLTYPE* Present1_t)(IDXGISwapChain*, UINT, UINT, const void*);
 
-struct SCRec { IDXGISwapChain* sc; void** shadowVt; void* origPresent; void* origPresent1; };
+struct SCRec
+{
+    IDXGISwapChain* sc;
+    void**          shadowVt;
+    void*           origPresent;
+    void*           origPresent1;
+    void**          liveVt;   // game's live vtable at hook time (drift target)
+    void*           live8;    // last-seen live slot values
+    void*           live13;
+    void*           live22;
+};
+static void ResyncShadowVtable(SCRec* rec);
 static SCRec g_scRecs[8];
 static int   g_scRecCount = 0;
 
@@ -350,10 +361,12 @@ static HRESULT PresentCommon(IDXGISwapChain* sc, UINT sync, UINT flags,
     if (InterlockedCompareExchange(&g_inPresent, 1, 0) != 0)
         return S_OK;
 
+    SCRec* rec = NULL;
     void* origFn = NULL;
     for (int i = 0; i < g_scRecCount; ++i)
         if (g_scRecs[i].sc == sc)
         {
+            rec = &g_scRecs[i];
             origFn = isPresent1 ? g_scRecs[i].origPresent1 : g_scRecs[i].origPresent;
             break;
         }
@@ -367,7 +380,7 @@ static HRESULT PresentCommon(IDXGISwapChain* sc, UINT sync, UINT flags,
 
     if (g_overlayEnabled && sc == g_gameSC && InterlockedCompareExchange(&g_frameLock, 1, 0) == 0)
     {
-        __try { RenderOverlay(sc); }
+        __try { ResyncShadowVtable(rec); RenderOverlay(sc); }
         __except (DumpOnException("KT_frame", GetExceptionInformation()))
         {
             ErrorLog("KenshiTrainer: overlay frame crashed");
@@ -405,6 +418,45 @@ static HRESULT STDMETHODCALLTYPE Present1_Detour(IDXGISwapChain* sc, UINT sync, 
     return PresentCommon(sc, sync, flags, params, true);
 }
 
+// Detect hookers that patched the LIVE vtable after our shadow swap (Dust
+// writes its detours into the live table at device-capture time, which is
+// later than our CreateSwapChain-time shadow install; without this its
+// Present never fires and its overlay silently dies). Resync = re-copy the
+// live table into our shadow and chain our hook to whatever the live slot
+// holds now, so both load orders compose into a single chain.
+static void ResyncShadowVtable(SCRec* rec)
+{
+    if (!rec || !rec->liveVt)
+        return;
+    void* live8 = NULL;
+    void* live13 = NULL;
+    void* live22 = NULL;
+    __try
+    {
+        live8 = rec->liveVt[8];
+        live13 = rec->liveVt[13];
+        live22 = rec->liveVt[22];
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER) { return; }
+
+    if (live8 == rec->live8 && live13 == rec->live13 && live22 == rec->live22)
+        return; // no drift
+
+    rec->origPresent = live8;
+    rec->origPresent1 = live22;
+    __try
+    {
+        memcpy(rec->shadowVt, rec->liveVt, sizeof(void*) * 32);
+        rec->shadowVt[8] = (void*)&Present_Detour;
+        rec->shadowVt[22] = (void*)&Present1_Detour;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER) { return; }
+    rec->live8 = live8;
+    rec->live13 = live13;
+    rec->live22 = live22;
+    DebugLog("KenshiTrainer: shadow vtable resynced (live-vtable hooker detected)");
+}
+
 // swap in a per-instance shadow vtable with Present (idx 8) and Present1
 // (idx 22, if the vtable has one) redirected. Only this swapchain instance is
 // affected; the shared class vtable stays untouched.
@@ -431,6 +483,10 @@ static void ShadowHookPresent(IDXGISwapChain* sc)
     g_scRecs[g_scRecCount].shadowVt = shadow;
     g_scRecs[g_scRecCount].origPresent = shadow[8];
     g_scRecs[g_scRecCount].origPresent1 = shadow[22];
+    g_scRecs[g_scRecCount].liveVt = origVt;
+    g_scRecs[g_scRecCount].live8 = shadow[8];
+    g_scRecs[g_scRecCount].live13 = shadow[13];
+    g_scRecs[g_scRecCount].live22 = shadow[22];
     shadow[8] = (void*)&Present_Detour;
     shadow[22] = (void*)&Present1_Detour;
 
