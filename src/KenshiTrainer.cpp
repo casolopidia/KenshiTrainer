@@ -168,6 +168,12 @@ static Item* SafeCreatePlainItem(const hand& owner, GameData* gd)
     __except (EXCEPTION_EXECUTE_HANDLER) { return NULL; }
 }
 
+static Item* SafeCreateGradedItem(const hand& owner, GameData* gd, int level)
+{
+    __try { return ou->theFactory->createItem(gd, owner, NULL, NULL, level, NULL); }
+    __except (EXCEPTION_EXECUTE_HANDLER) { return NULL; }
+}
+
 static bool SafeAddItem(Inventory* inv, Item* item, int qty)
 {
     // dropOnFail=true: full backpack -> item drops on the ground, not deleted
@@ -1038,12 +1044,12 @@ static bool SafeAmputate(Character* c, int limb)
     __except (EXCEPTION_EXECUTE_HANDLER) { return false; }
 }
 
-static bool SafeAttachProsthetic(Character* c, int limb, GameData* gd)
+static bool SafeAttachProsthetic(Character* c, int limb, GameData* gd, int level)
 {
     // the game's install path expects the RobotLimbItem to be in the
     // character's inventory first (that is where the limb GUI takes it from)
     hand nullHand;
-    Item* item = SafeCreatePlainItem(nullHand, gd);
+    Item* item = SafeCreateGradedItem(nullHand, gd, level); // -1 = auto grade
     if (!item)
         return false;
     Inventory* inv = SafeGetCharInventory(c);
@@ -1081,6 +1087,7 @@ static bool SafeRestoreLimb(Character* c, int limb)
 }
 
 static int g_selProsthetic[4] = { 0, 0, 0, 0 };
+static int g_limbGrade = -1; // prosthetic grade, -1 = auto (same scale as armour)
 
 static void DoAmputateLimb(int limb)
 {
@@ -1107,7 +1114,7 @@ static void DoAttachProsthetic(int limb)
         return;
     }
     GameData* gd = g_limbItems[sel];
-    if (SafeAttachProsthetic(c, limb, gd))
+    if (SafeAttachProsthetic(c, limb, gd, g_limbGrade))
     {
         char buf[300];
         sprintf_s(buf, "%s %s -> %s", TR(MSG_LIMB_ATTACHED), gd->name.c_str(), LimbName(limb));
@@ -1141,6 +1148,37 @@ static void DrawMedicalTab()
     }
     EnsureLimbCache();
     ImGui::TextUnformatted(TR(HINT_MEDICAL));
+    // prosthetic quality / level, same scheme as the armour spawner
+    {
+        static const char* const names[6] = { TR(QL_0), TR(QL_1), TR(QL_2),
+                                                TR(QL_3), TR(QL_4), TR(QL_5) };
+        static const int lvls[6] = { 5, 20, 40, 60, 80, 95 };
+        const char* preview = TR(OPT_AUTO);
+        if (g_limbGrade != -1)
+        {
+            preview = TR(QL_CUSTOM);
+            for (int q = 0; q < 6; ++q)
+                if (g_limbGrade == lvls[q]) { preview = names[q]; break; }
+        }
+        ImGui::TextUnformatted(TR(LBL_QUALITY));
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(130.0f);
+        if (ImGui::BeginCombo("##lgrade", preview))
+        {
+            if (ImGui::Selectable(TR(OPT_AUTO), g_limbGrade == -1))
+                g_limbGrade = -1;
+            for (int q = 0; q < 6; ++q)
+                if (ImGui::Selectable(names[q], g_limbGrade == lvls[q]))
+                    g_limbGrade = lvls[q];
+            ImGui::EndCombo();
+        }
+        ImGui::SameLine();
+        ImGui::PushItemWidth(80.0f);
+        ImGui::InputInt("##llevel", &g_limbGrade, 1, 10);
+        ImGui::PopItemWidth();
+        if (g_limbGrade < -1) g_limbGrade = -1;
+        if (g_limbGrade > 100) g_limbGrade = 100;
+    }
     ImGui::Separator();
 
     for (int limb = 0; limb < 4; ++limb)
