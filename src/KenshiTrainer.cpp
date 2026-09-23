@@ -807,12 +807,54 @@ static Sword* SafeCreateSword(GameData* gd, GameData* company, GameData* materia
     __except (EXCEPTION_EXECUTE_HANDLER) { return NULL; }
 }
 
+// ---------------------------------------------------------------------------
+// SAVE/LOAD FIX (quality reverting to "Catun No.1" after reload)
+// Save-file forensics on real saves: a graded weapon record keys the grade by
+// (company sid, level) + material sid. On load the game re-derives the model
+// from the manufacturer's "weapon models" list by matching the stored level;
+// if the (manufacturer, model, level) triple is inconsistent the loader falls
+// back to the global default grade = Catun No.1. The old code passed the free
+// slider value as level and DefaultCompany() even preferred "Homemade", so a
+// chosen Edge No.3 could be saved as (Homemade, level 0) -> reload -> Catun.
+// Fix: company must actually contain the model, and level must be the level
+// the manufacturer registers for that model (fcs.def value[0]).
+// ---------------------------------------------------------------------------
+static GameData* MfrOfModel(GameData* model, GameData* weapon)
+{
+    if (!model) return NULL;
+    // prefer a manufacturer that also lists this weapon type
+    for (size_t i = 0; i < g_mfrInfos.size(); ++i)
+        if (ListHas(g_mfrInfos[i].models, model) && MfrMakesWeapon(&g_mfrInfos[i], weapon))
+            return g_mfrInfos[i].gd;
+    for (size_t i = 0; i < g_mfrInfos.size(); ++i)
+        if (ListHas(g_mfrInfos[i].models, model))
+            return g_mfrInfos[i].gd;
+    return NULL;
+}
+
 static Item* CreateWeaponRobust(const hand& owner, GameData* gd, GameData* model, GameData* company)
 {
     if (!model) model = DefaultModel();
+    if (model)
+    {
+        GameData* mfrOfModel = MfrOfModel(model, gd);
+        ManufacturerInfo* mi = company ? FindMfr(company) : NULL;
+        // replace a company that cannot produce this model (e.g. the old
+        // "Homemade" default) with the model's own manufacturer
+        if (mfrOfModel && (!company || !mi || !ListHas(mi->models, model)))
+            company = mfrOfModel;
+    }
     if (!company) company = DefaultCompany();
-    int lvl = g_weaponLevel;
-    if (lvl < 0) lvl = 0; // CheatMenu semantics: 0 = game default grade
+    // level: the manufacturer's registered level for this model wins;
+    // the free slider is only a fallback when no model is resolved
+    int lvl = -1;
+    ManufacturerInfo* cmi = company ? FindMfr(company) : NULL;
+    if (cmi && model)
+        for (size_t k = 0; k < cmi->models.size(); ++k)
+            if (cmi->models[k] == model) { lvl = cmi->modelLevel[k]; break; }
+    if ((lvl < 1 || lvl > 100) && model) lvl = MfrModelLevel(model);
+    if (lvl < 1 || lvl > 100) lvl = g_weaponLevel;
+    if (lvl < 0) lvl = 0;
     if (lvl > 100) lvl = 100;
     Item* it = SafeCreateSword(gd, company, model, &owner, lvl);
     if (!it) it = SafeCreateWeapon(owner, gd, model, company); // factory path
@@ -865,6 +907,288 @@ static void DrawBuildTab()
         g_status = TR(LBL_BUILD_BYPASS);
     }
     ImGui::TextUnformatted(TR(HINT_BUILD_BYPASS));
+}
+
+// ---------------------------------------------------------------------------
+// Medical / prosthetic limbs
+//
+// Prosthetics live in the runtime DB as GameData of type LIMB_REPLACEMENT
+// (NOT ITEM - that is why the item spawner never lists them). Vanilla flow:
+// the limb must be severed first (MedicalSystem::amputate), then a
+// RobotLimbItem is installed through MedicalSystem::setRobotLimbItem (this
+// is what the game's own limb GUI calls). Restore = RobotLimbs::setLimb back
+// to LIMB_ORIGINAL + refill the flesh part.
+// ---------------------------------------------------------------------------
+static std::vector<GameData*> g_limbItems;
+static bool                   g_limbCacheBuilt = false;
+
+typedef boost::unordered::unordered_map<std::string, int, boost::hash<std::string>,
+    std::equal_to<std::string>, Ogre::STLAllocator<std::pair<const std::string, int>,
+    Ogre::GeneralAllocPolicy> > IDataMap;
+
+static void LogLimbKeysImpl(GameData* gd)
+{
+    std::string s;
+    for (IDataMap::const_iterator it = gd->idata.begin(); it != gd->idata.end(); ++it)
+    {
+        s += it->first;
+        s += " ";
+    }
+    DebugLog(std::string("KenshiTrainer: prosthetic idata keys: ") + s);
+}
+
+static void SafeLogLimbKeys(GameData* gd)
+{
+    __try { LogLimbKeysImpl(gd); }
+    __except (EXCEPTION_EXECUTE_HANDLER) {}
+}
+
+// which limb a prosthetic fits; -1 = unknown (then shown for every limb)
+static bool GuessLimbSide(GameData* gd, int* side)
+{
+    static const char* keys[] = { "limb type", "limb", "which limb", "side", NULL };
+    for (int i = 0; keys[i]; ++i)
+    {
+        std::string k(keys[i]);
+        int v = -1;
+        if (SafeGetIData(gd, &k, &v) && v >= 0 && v <= 3) { *side = v; return true; }
+    }
+    return false;
+}
+
+static void EnsureLimbCache()
+{
+    if (g_limbCacheBuilt)
+        return;
+    g_limbCacheBuilt = true;
+    if (!ou)
+        return;
+    lektor<GameData*> list;
+    if (SafeGetDataOfType(&ou->gamedata, LIMB_REPLACEMENT, &list))
+    {
+        for (uint32_t i = 0; i < list.size(); ++i)
+            if (list[i] && !list[i]->name.empty())
+                g_limbItems.push_back(list[i]);
+    }
+    std::sort(g_limbItems.begin(), g_limbItems.end(), GameDataNameLess);
+    char buf[96];
+    sprintf_s(buf, "KenshiTrainer: prosthetic items loaded: %d", (int)g_limbItems.size());
+    DebugLog(buf);
+    if (!g_limbItems.empty())
+        SafeLogLimbKeys(g_limbItems[0]);
+}
+
+static const char* LimbName(int limb)
+{
+    switch (limb)
+    {
+    case 0: return TR(LIMB_LEFT_ARM);
+    case 1: return TR(LIMB_RIGHT_ARM);
+    case 2: return TR(LIMB_LEFT_LEG);
+    default: return TR(LIMB_RIGHT_LEG);
+    }
+}
+
+static const char* LimbStateName(LimbState s)
+{
+    switch (s)
+    {
+    case LIMB_ORIGINAL: return TR(STATE_ORIGINAL);
+    case LIMB_STUMP:    return TR(STATE_STUMP);
+    case LIMB_REPLACED: return TR(STATE_REPLACED);
+    case LIMB_CRUSHED:  return TR(STATE_CRUSHED);
+    }
+    return TR(STATE_ORIGINAL);
+}
+
+static MedicalSystem* SafeGetMedical(Character* c)
+{
+    __try { return c->getMedical(); }
+    __except (EXCEPTION_EXECUTE_HANDLER) { return NULL; }
+}
+
+static Inventory* SafeGetCharInventory(Character* c)
+{
+    __try { return c->getInventory(); }
+    __except (EXCEPTION_EXECUTE_HANDLER) { return NULL; }
+}
+
+static bool SafeGetLimbState(Character* c, int limb, LimbState* out)
+{
+    __try
+    {
+        MedicalSystem* m = c->getMedical();
+        if (!m) return false;
+        *out = m->getLimbState((RobotLimbs::Limb)limb);
+        return true;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER) { return false; }
+}
+
+static bool SafeAmputate(Character* c, int limb)
+{
+    __try
+    {
+        MedicalSystem* m = c->getMedical();
+        if (!m) return false;
+        Ogre::Vector3 noForce(0.0f, 0.0f, 0.0f);
+        m->amputate((RobotLimbs::Limb)limb, false, noForce); // false = no severed-limb drop
+        return true;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER) { return false; }
+}
+
+static bool SafeAttachProsthetic(Character* c, int limb, GameData* gd)
+{
+    // the game's install path expects the RobotLimbItem to be in the
+    // character's inventory first (that is where the limb GUI takes it from)
+    hand nullHand;
+    Item* item = SafeCreatePlainItem(nullHand, gd);
+    if (!item)
+        return false;
+    Inventory* inv = SafeGetCharInventory(c);
+    if (inv)
+        SafeAddItem(inv, item, 1);
+    __try
+    {
+        MedicalSystem* m = c->getMedical();
+        if (!m) return false;
+        m->setRobotLimbItem((RobotLimbs::Limb)limb, item, false);
+        return true;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER) { return false; }
+}
+
+static bool SafeRestoreLimb(Character* c, int limb)
+{
+    __try
+    {
+        MedicalSystem* m = c->getMedical();
+        if (!m) return false;
+        if (m->getLimbState((RobotLimbs::Limb)limb) == LIMB_REPLACED)
+            m->setRobotLimbItem((RobotLimbs::Limb)limb, NULL, false); // detach prosthetic
+        if (m->robotLimbs)
+            m->robotLimbs->setLimb((RobotLimbs::Limb)limb, LIMB_ORIGINAL, NULL);
+        MedicalSystem::HealthPartStatus* part = m->getPart((RobotLimbs::Limb)limb);
+        if (part)
+        {
+            part->flesh = part->_maxHealth;
+            part->updateDerivedHealths();
+        }
+        return true;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER) { return false; }
+}
+
+static int g_selProsthetic[4] = { 0, 0, 0, 0 };
+
+static void DoAmputateLimb(int limb)
+{
+    Character* c = GetSelectedCharacter();
+    if (!c) { SetStatus(TR(MSG_NO_CHAR)); return; }
+    if (SafeAmputate(c, limb))
+    {
+        char buf[160];
+        sprintf_s(buf, "%s %s", TR(MSG_LIMB_SEVERED), LimbName(limb));
+        SetStatus(buf);
+    }
+    else
+        SetStatus(TR(MSG_LIMB_FAIL));
+}
+
+static void DoAttachProsthetic(int limb)
+{
+    Character* c = GetSelectedCharacter();
+    if (!c) { SetStatus(TR(MSG_NO_CHAR)); return; }
+    int sel = g_selProsthetic[limb];
+    if (sel < 0 || sel >= (int)g_limbItems.size())
+    {
+        SetStatus(TR(MSG_NO_ITEM));
+        return;
+    }
+    GameData* gd = g_limbItems[sel];
+    if (SafeAttachProsthetic(c, limb, gd))
+    {
+        char buf[300];
+        sprintf_s(buf, "%s %s -> %s", TR(MSG_LIMB_ATTACHED), gd->name.c_str(), LimbName(limb));
+        SetStatus(buf);
+    }
+    else
+        SetStatus(TR(MSG_LIMB_FAIL));
+}
+
+static void DoRestoreLimb(int limb)
+{
+    Character* c = GetSelectedCharacter();
+    if (!c) { SetStatus(TR(MSG_NO_CHAR)); return; }
+    if (SafeRestoreLimb(c, limb))
+    {
+        char buf[160];
+        sprintf_s(buf, "%s %s", TR(MSG_LIMB_RESTORED), LimbName(limb));
+        SetStatus(buf);
+    }
+    else
+        SetStatus(TR(MSG_LIMB_FAIL));
+}
+
+static void DrawMedicalTab()
+{
+    Character* c = GetSelectedCharacter();
+    if (!c)
+    {
+        ImGui::TextUnformatted(TR(MSG_NO_CHAR));
+        return;
+    }
+    EnsureLimbCache();
+    ImGui::TextUnformatted(TR(HINT_MEDICAL));
+    ImGui::Separator();
+
+    for (int limb = 0; limb < 4; ++limb)
+    {
+        ImGui::PushID(limb);
+        LimbState st = LIMB_ORIGINAL;
+        SafeGetLimbState(c, limb, &st);
+        ImGui::Text("%s: %s", LimbName(limb), LimbStateName(st));
+
+        ImGui::SameLine();
+        if (ImGui::Button(TR(BTN_AMPUTATE)))
+            DoAmputateLimb(limb);
+        if (st != LIMB_ORIGINAL)
+        {
+            ImGui::SameLine();
+            if (ImGui::Button(TR(BTN_RESTORE)))
+                DoRestoreLimb(limb);
+        }
+
+        if (!g_limbItems.empty())
+        {
+            int sel = g_selProsthetic[limb];
+            if (sel < 0 || sel >= (int)g_limbItems.size())
+                sel = 0;
+            const char* preview = g_limbItems[sel]->name.c_str();
+            if (ImGui::BeginCombo("##prost", preview))
+            {
+                for (size_t i = 0; i < g_limbItems.size(); ++i)
+                {
+                    int side = -1;
+                    if (GuessLimbSide(g_limbItems[i], &side) && side != limb)
+                        continue;
+                    if (ImGui::Selectable(g_limbItems[i]->name.c_str(), (int)i == sel))
+                        g_selProsthetic[limb] = (int)i;
+                }
+                ImGui::EndCombo();
+            }
+            ImGui::SameLine();
+            if (ImGui::Button(TR(BTN_ATTACH)))
+                DoAttachProsthetic(limb);
+        }
+        else
+        {
+            ImGui::TextUnformatted(TR(MSG_NO_LIMB_ITEMS));
+        }
+        ImGui::Separator();
+        ImGui::PopID();
+    }
 }
 
 
@@ -1422,8 +1746,14 @@ void DrawTrainerUI()
     }
     __except (EXCEPTION_EXECUTE_HANDLER) {}
 
-    // entry window: draggable by title, click button toggles the panel
-    ImGui::SetNextWindowPos(ImVec2(10.0f, 10.0f), ImGuiCond_FirstUseEver);
+    // entry window: anchored top-right of the game viewport; the stale ini
+    // is wiped at boot so FirstUseEver really re-anchors on every launch
+    {
+        ImGuiViewport* vp = ImGui::GetMainViewport();
+        ImGui::SetNextWindowPos(
+            ImVec2(vp->WorkPos.x + vp->WorkSize.x - 8.0f, vp->WorkPos.y + 8.0f),
+            ImGuiCond_FirstUseEver, ImVec2(1.0f, 0.0f));
+    }
     ImGui::Begin(TR(APP_NAME), NULL,
         ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize |
         ImGuiWindowFlags_NoCollapse);
@@ -1442,6 +1772,22 @@ void DrawTrainerUI()
     ImGui::SetNextWindowPos(ImVec2(220.0f, 80.0f), ImGuiCond_FirstUseEver);
     if (ImGui::Begin(TR(WINDOW_TITLE), &g_showMenu, 0))
     {
+        // keep the panel fully inside the viewport (stale coords / res change)
+        {
+            ImGuiViewport* vp = ImGui::GetMainViewport();
+            ImVec2 p = ImGui::GetWindowPos();
+            ImVec2 sz = ImGui::GetWindowSize();
+            float nx = p.x;
+            float ny = p.y;
+            if (nx < vp->WorkPos.x) nx = vp->WorkPos.x;
+            if (ny < vp->WorkPos.y) ny = vp->WorkPos.y;
+            if (nx + sz.x > vp->WorkPos.x + vp->WorkSize.x)
+                nx = vp->WorkPos.x + vp->WorkSize.x - sz.x;
+            if (ny + sz.y > vp->WorkPos.y + vp->WorkSize.y)
+                ny = vp->WorkPos.y + vp->WorkSize.y - sz.y;
+            if (nx != p.x || ny != p.y)
+                ImGui::SetWindowPos(ImVec2(nx, ny));
+        }
         if (ImGui::BeginTabBar("##tabs"))
         {
             if (ImGui::BeginTabItem(TR(TAB_STATS)))
@@ -1457,6 +1803,11 @@ void DrawTrainerUI()
             if (ImGui::BeginTabItem(TR(TAB_BUILD)))
             {
                 DrawBuildTab();
+                ImGui::EndTabItem();
+            }
+            if (ImGui::BeginTabItem(TR(TAB_MEDICAL)))
+            {
+                DrawMedicalTab();
                 ImGui::EndTabItem();
             }
             ImGui::EndTabBar();
@@ -1533,8 +1884,50 @@ static bool IsChineseLocaleId(const char* id, const char* sc, const wchar_t* nm)
     return false; // unknown locale: default to English
 }
 
+// RE_Kenshi loads PreloadPlugins for EVERY installed mod - even disabled ones
+// (its Plugins.cpp iterates ou->availabelModsOrderedList, unlike "Plugins"
+// which only iterates activeMods). DustBoot defends against this by checking
+// data\mods.cfg first; without the guard our overlay/hooks would activate for
+// users who merely have the mod subscribed but disabled.
+// Conservative variant: only suppress when mods.cfg was read successfully AND
+// does not list us - exotic layouts (GOG, 1.0.68 compat exe) stay permissive.
+static bool TrainerEnabledInLoadOrder()
+{
+    wchar_t exe[1024];
+    DWORD n = GetModuleFileNameW(NULL, exe, 1024);
+    if (!n || n >= 1024) return true;
+    std::wstring path(exe);
+    size_t slash = path.find_last_of(L"\\/");
+    if (slash == std::wstring::npos) return true;
+    path.resize(slash + 1);
+    path += L"data\\mods.cfg";
+    HANDLE f = CreateFileW(path.c_str(), GENERIC_READ,
+        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+        NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (f == INVALID_HANDLE_VALUE) return true; // unknown layout: stay permissive
+    LARGE_INTEGER sz;
+    if (!GetFileSizeEx(f, &sz) || sz.QuadPart <= 0 || sz.QuadPart > 4 * 1024 * 1024)
+    {
+        CloseHandle(f);
+        return true;
+    }
+    std::string content((size_t)sz.QuadPart, '\0');
+    DWORD rd = 0;
+    ReadFile(f, &content[0], (DWORD)sz.QuadPart, &rd, NULL);
+    CloseHandle(f);
+    content.resize(rd);
+    for (size_t i = 0; i < content.size(); ++i)
+        content[i] = (char)tolower((unsigned char)content[i]);
+    return content.find("kenshitrainer.mod") != std::string::npos;
+}
+
 __declspec(dllexport) void startPlugin()
 {
+    if (!TrainerEnabledInLoadOrder())
+    {
+        DebugLog("KenshiTrainer: mod not enabled in mods.cfg, staying dormant");
+        return;
+    }
     g_trChinese = DetectChineseUI();
     DebugLog(std::string("KenshiTrainer: UI language = ") + (g_trChinese ? "Chinese" : "English"));
     BuildBypass_Install();
