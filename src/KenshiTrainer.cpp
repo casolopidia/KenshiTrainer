@@ -1923,6 +1923,7 @@ static bool TrainerEnabledInLoadOrder()
 
 __declspec(dllexport) void startPlugin()
 {
+    if (GetEnvironmentVariableA("KT_NOHOOK", NULL, 0)) { DebugLog("KenshiTrainer: KT_NOHOOK set, startPlugin skipped"); return; }
     if (!TrainerEnabledInLoadOrder())
     {
         DebugLog("KenshiTrainer: mod not enabled in mods.cfg, staying dormant");
@@ -1930,7 +1931,10 @@ __declspec(dllexport) void startPlugin()
     }
     g_trChinese = DetectChineseUI();
     DebugLog(std::string("KenshiTrainer: UI language = ") + (g_trChinese ? "Chinese" : "English"));
-    BuildBypass_Install();
+    if (!GetEnvironmentVariableA("KT_NOBYPASS", NULL, 0))
+        BuildBypass_Install();
+    else
+        DebugLog("KenshiTrainer: KT_NOBYPASS set, bypass hooks skipped");
     Overlay_Init();
     DebugLog("KenshiTrainer plugin started");
 }

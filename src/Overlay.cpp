@@ -529,12 +529,34 @@ static void OnSwapChain(IDXGISwapChain* sc)
 }
 
 // ---------------------------------------------------------------------------
-// creation hooks (function-code hooks via KenshiLib - the DustBoot layer)
+// Dust coexistence, bisect root cause: two modules AddHook-ing the SAME dxgi
+// export (D3D11CreateDeviceAndSwapChain / CreateSwapChain / CreateSwapChainForHwnd)
+// via KenshiLib crashes the game nondeterministically during concurrent D3D init
+// (any single dxgi-export hook of ours + Dust = death; uncontended exports like
+// D3D11CreateDevice or game functions = fine; a debugger hides it by shifting
+// timing). The game creates its DXGI factory BEFORE any plugin can hook it, so
+// the initial swapchain cannot be captured late without those contested hooks.
+//
+// Strategy: hook ONLY D3D11CreateDevice at plugin load (uncontended - Dust never
+// patches it). On its first call (~game device creation, when DustBoot.dll is
+// already loaded) decide:
+//   - Dust absent: install the classic creation hooks (solo behaviour).
+//   - Dust present: skip them; the overlay stays dormant and Dust owns the
+//     render pipeline. No crash, full Dust functionality.
 // ---------------------------------------------------------------------------
 
 typedef HRESULT(STDMETHODCALLTYPE* CreateSwapChain_t)(
     IDXGIFactory*, IUnknown*, DXGI_SWAP_CHAIN_DESC*, IDXGISwapChain**);
 static CreateSwapChain_t g_origCreateSwapChain = NULL;
+
+typedef HRESULT(STDMETHODCALLTYPE* CreateSwapChainForHwnd_t)(
+    IUnknown*, IUnknown*, HWND, const void*, const void*, IUnknown*, void**);
+static CreateSwapChainForHwnd_t g_origCSCFH = NULL;
+
+typedef HRESULT(WINAPI* D3D11CDSC_t)(IDXGIAdapter*, D3D_DRIVER_TYPE, HMODULE, UINT,
+    const D3D_FEATURE_LEVEL*, UINT, UINT, const DXGI_SWAP_CHAIN_DESC*, IDXGISwapChain**,
+    ID3D11Device**, D3D_FEATURE_LEVEL*, ID3D11DeviceContext**);
+static D3D11CDSC_t g_origD3D11CDSC = NULL;
 
 static HRESULT STDMETHODCALLTYPE CreateSwapChain_Hook(
     IDXGIFactory* self, IUnknown* dev, DXGI_SWAP_CHAIN_DESC* desc, IDXGISwapChain** out)
@@ -545,10 +567,6 @@ static HRESULT STDMETHODCALLTYPE CreateSwapChain_Hook(
     return hr;
 }
 
-typedef HRESULT(STDMETHODCALLTYPE* CreateSwapChainForHwnd_t)(
-    IUnknown*, IUnknown*, HWND, const void*, const void*, IUnknown*, void**);
-static CreateSwapChainForHwnd_t g_origCSCFH = NULL;
-
 static HRESULT STDMETHODCALLTYPE CreateSwapChainForHwnd_Hook(
     IUnknown* self, IUnknown* dev, HWND hwnd, const void* desc,
     const void* fsDesc, IUnknown* output, void** out)
@@ -558,12 +576,6 @@ static HRESULT STDMETHODCALLTYPE CreateSwapChainForHwnd_Hook(
         OnSwapChain((IDXGISwapChain*)*out); // IDXGISwapChain1 derives IDXGISwapChain
     return hr;
 }
-
-typedef HRESULT(WINAPI* D3D11CDSC_t)(
-    IDXGIAdapter*, D3D_DRIVER_TYPE, HMODULE, UINT, const D3D_FEATURE_LEVEL*, UINT,
-    UINT, const DXGI_SWAP_CHAIN_DESC*, IDXGISwapChain**, ID3D11Device**,
-    D3D_FEATURE_LEVEL*, ID3D11DeviceContext**);
-static D3D11CDSC_t g_origD3D11CDSC = NULL;
 
 static HRESULT WINAPI D3D11CDSC_Hook(
     IDXGIAdapter* adapter, D3D_DRIVER_TYPE dt, HMODULE sw, UINT flags,
@@ -578,46 +590,134 @@ static HRESULT WINAPI D3D11CDSC_Hook(
     return hr;
 }
 
-// create a temp factory purely to READ the vtable (DustBoot does the same via
-// a temp swapchain + GetParent); hook the two creation functions found there.
-static void HookFactoryFunctions()
+// classic creation hooks, installed only when Dust is NOT around
+static void InstallLegacyCreationHooks()
 {
+    HMODULE d3d11m = GetModuleHandleA("d3d11.dll");
+    if (!d3d11m) d3d11m = LoadLibraryA("d3d11.dll");
+    void* cdsc = d3d11m ? (void*)GetProcAddress(d3d11m, "D3D11CreateDeviceAndSwapChain") : NULL;
+    if (cdsc && KenshiLib::SUCCESS != KenshiLib::AddHook(cdsc, &D3D11CDSC_Hook, (void**)&g_origD3D11CDSC))
+        ErrorLog("KenshiTrainer: failed to hook D3D11CreateDeviceAndSwapChain");
+
+    HMODULE dxgim = GetModuleHandleA("dxgi.dll");
+    if (!dxgim) dxgim = LoadLibraryA("dxgi.dll");
     typedef HRESULT(WINAPI* CF1_t)(REFIID, void**);
-    HMODULE dxgi = GetModuleHandleA("dxgi.dll");
-    if (!dxgi) dxgi = LoadLibraryA("dxgi.dll");
-    if (!dxgi)
-        return;
-    CF1_t cf1 = (CF1_t)GetProcAddress(dxgi, "CreateDXGIFactory1");
-    if (!cf1)
-        return;
-    IDXGIFactory* factory = NULL;
-    if (FAILED(cf1(__uuidof(IDXGIFactory), (void**)&factory)) || !factory)
-        return;
-
-    void** vt = *(void***)factory;
-    void* createSwapChainFn = vt[10];
-
-    void* cscfhFn = NULL;
-    IUnknown* f2 = NULL;
-    if (SUCCEEDED(factory->QueryInterface(KT_IID_IDXGIFactory2, (void**)&f2)) && f2)
+    CF1_t cf1 = dxgim ? (CF1_t)GetProcAddress(dxgim, "CreateDXGIFactory1") : NULL;
+    if (cf1)
     {
-        void** vt2 = *(void***)f2;
-        cscfhFn = vt2[15];
-        f2->Release();
+        IDXGIFactory* factory = NULL;
+        __try
+        {
+            if (SUCCEEDED(cf1(__uuidof(IDXGIFactory), (void**)&factory)) && factory)
+            {
+                void** vt = *(void***)factory;
+                void* cscFn = vt[10];
+                void* cscfhFn = vt[15];
+                factory->Release();
+                factory = NULL;
+                if (cscFn && KenshiLib::SUCCESS != KenshiLib::AddHook(cscFn, &CreateSwapChain_Hook, (void**)&g_origCreateSwapChain))
+                    ErrorLog("KenshiTrainer: failed to hook CreateSwapChain");
+                if (cscfhFn && KenshiLib::SUCCESS != KenshiLib::AddHook(cscfhFn, &CreateSwapChainForHwnd_Hook, (void**)&g_origCSCFH))
+                    ErrorLog("KenshiTrainer: failed to hook CreateSwapChainForHwnd");
+                DebugLog("KenshiTrainer: legacy creation hooks installed (no Dust)");
+            }
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER) {}
+        __try { if (factory) factory->Release(); } __except (EXCEPTION_EXECUTE_HANDLER) {}
     }
-    factory->Release();
+}
 
-    if (createSwapChainFn)
+static bool g_lateHookDecisionDone = false;
+static void LateHookDecision()
+{
+    if (g_lateHookDecisionDone)
+        return;
+    g_lateHookDecisionDone = true;
+    if (GetModuleHandleA("DustBoot.dll") || GetModuleHandleA("Dust.dll"))
     {
-        if (KenshiLib::SUCCESS != KenshiLib::AddHook(createSwapChainFn, &CreateSwapChain_Hook, (void**)&g_origCreateSwapChain))
-            ErrorLog("KenshiTrainer: failed to hook CreateSwapChain");
+        // sharing the dxgi-export hooks with Dust crashes at init (race); the
+        // game factory also predates us, so the swapchain cannot be captured
+        // late. Stay dormant instead of killing the game.
+        DebugLog("KenshiTrainer: Dust detected - dxgi creation hooks skipped, overlay dormant");
+        return;
     }
-    if (cscfhFn)
+    InstallLegacyCreationHooks();
+}
+
+typedef HRESULT(WINAPI* D3D11CreateDevice_t)(IDXGIAdapter*, D3D_DRIVER_TYPE, HMODULE, UINT,
+    const D3D_FEATURE_LEVEL*, UINT, UINT, ID3D11Device**, D3D_FEATURE_LEVEL*, ID3D11DeviceContext**);
+static D3D11CreateDevice_t g_origD3D11CreateDevice = NULL;
+
+// fallback trigger: the game's real window. OGRE needs the window before it
+// can create the swapchain, so installing the classic hooks the moment the
+// window appears still catches swapchain creation (solo mode)
+static BOOL CALLBACK FindGameWindowProc(HWND hwnd, LPARAM lParam)
+{
+    DWORD pid = 0;
+    GetWindowThreadProcessId(hwnd, &pid);
+    if (pid != GetCurrentProcessId())
+        return TRUE;
+    if (!IsWindowVisible(hwnd))
+        return TRUE;
+    RECT rc;
+    if (!GetWindowRect(hwnd, &rc))
+        return TRUE;
+    if ((rc.right - rc.left) < 200 || (rc.bottom - rc.top) < 150)
+        return TRUE; // skip the 1x1 launcher window
+    *(HWND*)lParam = hwnd;
+    return FALSE;
+}
+
+static DWORD WINAPI WindowWatchdog(LPVOID)
+{
+    for (int i = 0; i < 600; ++i) // up to 60 s
     {
-        if (KenshiLib::SUCCESS != KenshiLib::AddHook(cscfhFn, &CreateSwapChainForHwnd_Hook, (void**)&g_origCSCFH))
-            ErrorLog("KenshiTrainer: failed to hook CreateSwapChainForHwnd");
+        HWND game = NULL;
+        EnumWindows(&FindGameWindowProc, (LPARAM)&game);
+        if (game)
+        {
+            LateHookDecision();
+            return 0;
+        }
+        Sleep(100);
     }
-    DebugLog("KenshiTrainer: factory function hooks installed");
+    DebugLog("KenshiTrainer: game window not found in 60s, overlay dormant");
+    return 0;
+}
+
+// uncontended triggers for the deferred decision: OGRE creates its factory
+// via CreateDXGIFactory1 and the device via D3D11CreateDevice during init; the
+// classic (contested) creation hooks are installed AFTER the decision, never
+// alongside Dust's
+typedef HRESULT(WINAPI* CreateDXGIFactory1_t)(REFIID, void**);
+static CreateDXGIFactory1_t g_origCDGF1 = NULL;
+static HRESULT WINAPI CreateDXGIFactory1_Hook(REFIID riid, void** ppFactory)
+{
+    HRESULT hr = g_origCDGF1(riid, ppFactory);
+    if (SUCCEEDED(hr))
+        LateHookDecision();
+    return hr;
+}
+
+typedef HRESULT(WINAPI* CreateDXGIFactory_t)(REFIID, void**);
+static CreateDXGIFactory_t g_origCDGF = NULL;
+static HRESULT WINAPI CreateDXGIFactory_Hook(REFIID riid, void** ppFactory)
+{
+    HRESULT hr = g_origCDGF(riid, ppFactory);
+    if (SUCCEEDED(hr))
+        LateHookDecision();
+    return hr;
+}
+
+static HRESULT WINAPI D3D11CreateDevice_Hook(IDXGIAdapter* adapter, D3D_DRIVER_TYPE dt, HMODULE sw,
+    UINT flags, const D3D_FEATURE_LEVEL* levels, UINT numLevels, UINT sdk,
+    ID3D11Device** devOut, D3D_FEATURE_LEVEL* flOut, ID3D11DeviceContext** ctxOut)
+{
+    HRESULT hr = g_origD3D11CreateDevice(adapter, dt, sw, flags, levels, numLevels, sdk,
+        devOut, flOut, ctxOut);
+    if (SUCCEEDED(hr) && devOut && *devOut)
+        LateHookDecision();
+    return hr;
 }
 
 void Overlay_Init()
@@ -644,15 +744,25 @@ void Overlay_Init()
 
     HMODULE d3d11 = GetModuleHandleA("d3d11.dll");
     if (!d3d11) d3d11 = LoadLibraryA("d3d11.dll");
-    void* cdsc = d3d11 ? (void*)GetProcAddress(d3d11, "D3D11CreateDeviceAndSwapChain") : NULL;
-    if (cdsc)
+    void* cd = d3d11 ? (void*)GetProcAddress(d3d11, "D3D11CreateDevice") : NULL;
+    if (cd)
     {
-        if (KenshiLib::SUCCESS != KenshiLib::AddHook(cdsc, &D3D11CDSC_Hook, (void**)&g_origD3D11CDSC))
-            ErrorLog("KenshiTrainer: failed to hook D3D11CreateDeviceAndSwapChain");
+        if (KenshiLib::SUCCESS != KenshiLib::AddHook(cd, &D3D11CreateDevice_Hook, (void**)&g_origD3D11CreateDevice))
+            ErrorLog("KenshiTrainer: failed to hook D3D11CreateDevice");
+        else
+            DebugLog("KenshiTrainer: D3D11CreateDevice hook installed (deferred creation hooks)");
     }
+    HMODULE dxgi2 = GetModuleHandleA("dxgi.dll");
+    if (!dxgi2) dxgi2 = LoadLibraryA("dxgi.dll");
+    void* f1 = dxgi2 ? (void*)GetProcAddress(dxgi2, "CreateDXGIFactory1") : NULL;
+    if (f1 && KenshiLib::SUCCESS != KenshiLib::AddHook(f1, &CreateDXGIFactory1_Hook, (void**)&g_origCDGF1))
+        ErrorLog("KenshiTrainer: failed to hook CreateDXGIFactory1");
+    void* f0 = dxgi2 ? (void*)GetProcAddress(dxgi2, "CreateDXGIFactory") : NULL;
+    if (f0 && KenshiLib::SUCCESS != KenshiLib::AddHook(f0, &CreateDXGIFactory_Hook, (void**)&g_origCDGF))
+        ErrorLog("KenshiTrainer: failed to hook CreateDXGIFactory");
 
-    HookFactoryFunctions();
-
+    HANDLE wt = CreateThread(NULL, 0, &WindowWatchdog, NULL, 0, NULL);
+    if (wt) CloseHandle(wt);
     g_prevUEF = SetUnhandledExceptionFilter(&TrainerUEF);
     DebugLog("KenshiTrainer: overlay hooks installed");
 }
