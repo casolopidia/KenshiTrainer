@@ -529,6 +529,147 @@ static void OnSwapChain(IDXGISwapChain* sc)
 }
 
 // ---------------------------------------------------------------------------
+// swapchain discovery by read-only memory scan. After the game creates its
+// swapchain, the object lives somewhere in this process with the dxgi
+// swapchain vtable pointer as its first qword. We scan committed private
+// memory (pure reads, no writes, no hooks on contested exports) and validate
+// candidates with a strict signature + a SEH-guarded GetDesc. Works with or
+// without Dust: the instance-vptr shadow + drift resync above compose with
+// DustBoot's live-vtable Present hook in either install order.
+// ---------------------------------------------------------------------------
+
+static DWORD DxgiModuleSize(HMODULE dxgi)
+{
+    __try
+    {
+        BYTE* base = (BYTE*)dxgi;
+        DWORD peOff = *(DWORD*)(base + 0x3C);
+        if (*(DWORD*)(base + peOff) != 0x00004550)
+            return 0;
+        BYTE* opt = base + peOff + 24;
+        WORD magic = *(WORD*)opt;
+        if (magic == 0x20B)
+            return *(DWORD*)(opt + 56);  // SizeOfImage (PE32+)
+        if (magic == 0x10B)
+            return *(DWORD*)(opt + 56);  // SizeOfImage (PE32, same offset)
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER) {}
+    return 0;
+}
+
+static bool ValidateSwapChainCandidate(IDXGISwapChain* sc, DWORD64 dxgiBase, DWORD64 dxgiEnd)
+{
+    __try
+    {
+        void** vt = *(void***)sc;
+        if ((DWORD64)vt < dxgiBase || (DWORD64)vt >= dxgiEnd)
+            return false;
+        void* present = vt[8]; // IDXGISwapChain::Present
+        if ((DWORD64)present < dxgiBase || (DWORD64)present >= dxgiEnd)
+            return false;
+        DXGI_SWAP_CHAIN_DESC dd;
+        if (FAILED(sc->GetDesc(&dd)) || !dd.OutputWindow)
+            return false;
+        if (dd.BufferDesc.Width < 640 || dd.BufferDesc.Height < 480)
+            return false; // launcher 1x1 / DustBoot dummy chains
+        DWORD wpid = 0;
+        GetWindowThreadProcessId(dd.OutputWindow, &wpid);
+        if (wpid != GetCurrentProcessId())
+            return false;
+        char cls[64] = { 0 };
+        if (GetClassNameA(dd.OutputWindow, cls, sizeof(cls)) &&
+            strcmp(cls, "DustBootDummy") == 0)
+            return false;
+        return true;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER) { return false; }
+}
+
+static int g_scanHits = 0;
+static int g_scanVtHits = 0;
+static int g_scanGetDescOk = 0;
+
+static bool ScanMemoryForSwapChain(IDXGISwapChain** out)
+{
+    HMODULE dxgi = GetModuleHandleA("dxgi.dll");
+    if (!dxgi)
+        return false;
+    DWORD size = DxgiModuleSize(dxgi);
+    if (!size)
+        return false;
+    DWORD64 dxgiBase = (DWORD64)dxgi;
+    DWORD64 dxgiEnd = dxgiBase + size;
+    DWORD64 addr = 0x10000;
+    MEMORY_BASIC_INFORMATION mbi;
+    int regions = 0;
+    DebugLog("KenshiTrainer: scan entry");
+    while (VirtualQuery((LPCVOID)addr, &mbi, sizeof(mbi)) == sizeof(mbi))
+    {
+        DWORD64 base = (DWORD64)mbi.BaseAddress;
+        DWORD64 rsize = (DWORD64)mbi.RegionSize;
+        if (mbi.State == MEM_COMMIT && mbi.Type == MEM_PRIVATE &&
+            mbi.Protect == PAGE_READWRITE &&
+            rsize >= 16 && rsize <= (DWORD64)256 * 1024 * 1024)
+        {
+            ++regions;
+            // chunked reads with a 1 ms yield every MB: a full-memory scan
+            // must never stall the render thread long enough to trip the
+            // GPU watchdog (device-removed exits looked like random deaths)
+            const DWORD64 CHUNK = 1024 * 1024;
+            for (DWORD64 off = 0; off < rsize; off += CHUNK)
+            {
+                DWORD64* p = (DWORD64*)(base + off);
+                size_t n = (size_t)((rsize - off < CHUNK ? rsize - off : CHUNK) / 8);
+                __try
+                {
+                    for (size_t i = 0; i < n; ++i)
+                    {
+                        DWORD64 v = p[i];
+                        if (v >= dxgiBase && v < dxgiEnd)
+                        {
+                            ++g_scanVtHits;
+                            IDXGISwapChain* sc = (IDXGISwapChain*)&p[i];
+                            if (ValidateSwapChainCandidate(sc, dxgiBase, dxgiEnd))
+                            {
+                                *out = sc;
+                                return true;
+                            }
+                        }
+                    }
+                }
+                __except (EXCEPTION_EXECUTE_HANDLER) {}
+                Sleep(1);
+            }
+        }
+        if ((regions % 500) == 0)
+        { char db[128]; sprintf_s(db, "KenshiTrainer: scan progress regions=%d addr=%llX", regions, (unsigned long long)addr); DebugLog(db); }
+        if (rsize == 0)
+            break;
+        addr = base + rsize;
+    }
+    { char db[160]; sprintf_s(db, "KenshiTrainer: scan pass regions=%d vtHits=%d", regions, g_scanVtHits); DebugLog(db); }
+    return false;
+}
+
+static DWORD WINAPI SwapChainScanner(LPVOID)
+{
+    DebugLog("KenshiTrainer: scanner thread started");
+    for (int i = 0; i < 40; ++i) // up to ~60 s of boot
+    {
+        IDXGISwapChain* sc = NULL;
+        if (ScanMemoryForSwapChain(&sc))
+        {
+            DebugLog("KenshiTrainer: swapchain found by memory scan");
+            OnSwapChain(sc); // shadow-hook Present + select as game swapchain
+            return 0;
+        }
+        Sleep(1500);
+    }
+    DebugLog("KenshiTrainer: swapchain scan gave up after 60s, overlay dormant");
+    return 0;
+}
+
+// ---------------------------------------------------------------------------
 // Dust coexistence, bisect root cause: two modules AddHook-ing the SAME dxgi
 // export (D3D11CreateDeviceAndSwapChain / CreateSwapChain / CreateSwapChainForHwnd)
 // via KenshiLib crashes the game nondeterministically during concurrent D3D init
@@ -638,7 +779,7 @@ static void LateHookDecision()
         // sharing the dxgi-export hooks with Dust crashes at init (race); the
         // game factory also predates us, so the swapchain cannot be captured
         // late. Stay dormant instead of killing the game.
-        DebugLog("KenshiTrainer: Dust detected - dxgi creation hooks skipped, overlay dormant");
+        DebugLog("KenshiTrainer: Dust detected - dxgi creation hooks skipped, overlay dormant (coexistence mode)");
         return;
     }
     InstallLegacyCreationHooks();
@@ -761,6 +902,9 @@ void Overlay_Init()
     if (f0 && KenshiLib::SUCCESS != KenshiLib::AddHook(f0, &CreateDXGIFactory_Hook, (void**)&g_origCDGF))
         ErrorLog("KenshiTrainer: failed to hook CreateDXGIFactory");
 
+    // NOTE: memory-scan swapchain capture (SwapChainScanner) was tried and
+    // abandoned: the scan never completed a pass in-vivo and the extra
+        // thread coincided with real-speed deaths. The dormant design stands.
     HANDLE wt = CreateThread(NULL, 0, &WindowWatchdog, NULL, 0, NULL);
     if (wt) CloseHandle(wt);
     g_prevUEF = SetUnhandledExceptionFilter(&TrainerUEF);
