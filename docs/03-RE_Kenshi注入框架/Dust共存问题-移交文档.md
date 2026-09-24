@@ -68,3 +68,30 @@ KenshiTrainer（本仓库，RE_Kenshi/KenshiLib 插件）与 Dust（创意工坊
 - UI 字符串一律走 `tools\gen_medical_strings.py` 模式生成进 ChineseStrings.h，源码禁中文
 - Dust 的源码副本在项目 `Dust-main\`（≈ workshop v0.7.5.3，上游 github.com/Bazouz660/Dust）；RE_Kenshi 源码副本在 `reference\RE_Kenshi_repo\`
 - 测试是游戏内手动验证；每轮改动定期 commit
+
+## 2026-09-24 补充：OGRE 路线逆向结果（全部完成，代码已落地 a3b122c）
+
+**版本澄清**：游戏 OGRE 是 2.x（导出含 CompositorManager2 / InstancingThreadedCullingMethod），非移交文档此前猜测的 1.8/1.9。本机 KenshiLib deps 的头文件集（OgreRoot.h/OgreRenderTarget.h/OgreD3D11RenderWindow.h 等齐全）与游戏 DLL 类名经 RTTI 比对一致，可用作布局参考。
+
+**已验证偏移链**（每条至少两处独立证据）：
+
+| 项 | 位置 | 证据 |
+|----|------|------|
+| `Singleton<Root>::msSingleton` | OgreMain_x64.dll RVA **0x909B20** | 构造器 0x4C090 的 `mov [rip+..],rcx`；getSingletonPtr 0x2A2A40 的读取；导出表 `?msSingleton@?$Singleton@VRoot@Ogre@@@Ogre@@` 直接指向 0x909B20 |
+| `Root::mRenderSystems` | Root+**0x08**（vector） | getAvailableRenderers 0x2A4E50：`lea rax,[rcx+8]` |
+| `Root::mActiveRenderSystem` | Root+**0x28** | getRenderSystem 0x2A5080 |
+| `Root::mAutoWindow` | Root+**0x168** | getAutoCreatedWindow 0x2A7590 |
+| `WindowEventUtilities::_msWindows` | OgreMain RVA **0x8D9F40**（begin）/0x8D9F48（end）/0x8D9F50（cap） | 导出表 + `_addRenderWindow` push_back 实现 + `_removeRenderWindow` 遍历均引用此三地址 |
+| `D3D11RenderWindowHwnd` vtable | RenderSystem_Direct3D11_x64.dll RVA **0x7C548** | RTTI COL 遍历（`.?AVD3D11RenderWindowHwnd@Ogre@@`） |
+| `mpSwapChain` | 窗口对象+**0x130** | 3 处：destroy（SetFullscreenState+Release）、GetBuffer(0) 回读、swapBuffers 尾部 `call [rax+0x40]`=Present |
+
+**实现**（Overlay.cpp，commit a3b122c）：Dust 分支不再休眠，启动 `OgreSwapChainWatch` 线程（500ms 轮询）：
+1. 主路径：`_msWindows` 找 vptr == RenderSystem 基址+0x7C548 的窗口 → +0x130 取 mpSwapChain
+2. 后备：msSingleton → Root+0x168 mAutoWindow → 同上
+3. 候选过现有 `ValidateSwapChainCandidate`（dxgi vtable 范围 + GetDesc + 窗口归属 + 排除 DustBootDummy）
+4. 命中 → `OnSwapChain(sc)`（shadow vtable + 漂移重同步机制原样复用，与 Dust 活表钩任意顺序兼容）
+5. 持续轮询以捕获 swapchain 重建（全屏切换等）
+
+预期日志序列（双开）：`Dust detected - ... using OGRE-internal swapchain discovery` → `OGRE swapchain watch started` → `swapchain found via OGRE internals: 0x...` → `Present shadow-hooked on swapchain`（可能出现 `shadow vtable resynced`）。
+
+**待游戏内验证**：双开时修改器界面可用且 Dust 全功能；单开回归（legacy 路径未动）。验证通过后更新 docs/08 发布说明。
