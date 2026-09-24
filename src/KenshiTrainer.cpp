@@ -1031,6 +1031,38 @@ static bool SafeGetLimbState(Character* c, int limb, LimbState* out)
     __except (EXCEPTION_EXECUTE_HANDLER) { return false; }
 }
 
+// heal the operated limb to its TRUE cap (maxHealth(), not the raw field) and
+// clear the KO/bloodloss side effects an amputation causes - clean surgery
+static bool SafeHealAfterLimbOp(Character* c, int limb)
+{
+    __try
+    {
+        MedicalSystem* m = c->getMedical();
+        if (!m) return false;
+        MedicalSystem::HealthPartStatus* part = m->getPart((RobotLimbs::Limb)limb);
+        if (part)
+        {
+            float mh = part->maxHealth();
+            if (mh <= 0.0f) mh = part->_maxHealth;
+            if (mh <= 0.0f) mh = 100.0f;
+            part->flesh = mh;
+            part->fleshStun = 0.0f;
+            part->bandaging = 0.0f;
+            part->juryRigging = 0.0f;
+            part->wearDamage = 0.0f;
+            part->updateDerivedHealths();
+        }
+        m->unconcious = false;
+        m->sub50KO = false;
+        m->bloodlossTrauma = false;
+        m->crippled = false;
+        m->validateHealthValues();
+        m->reassessCollapseMode(true, false);
+        return true;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER) { return false; }
+}
+
 static bool SafeAmputate(Character* c, int limb)
 {
     __try
@@ -1075,12 +1107,7 @@ static bool SafeRestoreLimb(Character* c, int limb)
             m->setRobotLimbItem((RobotLimbs::Limb)limb, NULL, false); // detach prosthetic
         if (m->robotLimbs)
             m->robotLimbs->setLimb((RobotLimbs::Limb)limb, LIMB_ORIGINAL, NULL);
-        MedicalSystem::HealthPartStatus* part = m->getPart((RobotLimbs::Limb)limb);
-        if (part)
-        {
-            part->flesh = part->_maxHealth;
-            part->updateDerivedHealths();
-        }
+        SafeHealAfterLimbOp(c, limb); // restored limb comes back at FULL hp
         return true;
     }
     __except (EXCEPTION_EXECUTE_HANDLER) { return false; }
@@ -1095,6 +1122,7 @@ static void DoAmputateLimb(int limb)
     if (!c) { SetStatus(TR(MSG_NO_CHAR)); return; }
     if (SafeAmputate(c, limb))
     {
+        SafeHealAfterLimbOp(c, limb); // clean surgery: no lingering damage/KO
         char buf[160];
         sprintf_s(buf, "%s %s", TR(MSG_LIMB_SEVERED), LimbName(limb));
         SetStatus(buf);
