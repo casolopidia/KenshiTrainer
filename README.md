@@ -16,8 +16,10 @@
   - 武器：制造商 / 模型联动选择，等级或品质档（中级救助~铭物）驱动
   - 护甲/弩：六档品质（模本~杰作）+ 等级微调
   - 生成到选中角色背包，背包已满时自动掉落地面不丢物品
-- **建筑放置验证开关**：关闭放置有效性检查（坡度/重叠/室内等不再拦截），预览颜色仍显示真实有效性，违规位置也能放下
+- **医疗**：截肢 / 义肢安装（全义肢库枚举，支持品质档选择，默认自动）/ 恢复原生肢体（满血恢复）；换装或卸下义肢自动退回背包
+- **建筑放置验证开关**：关闭放置有效性检查（坡度/重叠/室内等不再拦截），预览颜色仍显示真实有效性，违规位置也能放下（已知存在未修复 bug，酌情使用）
 - **中英双语界面**：根据游戏当前语言自动切换
+- **兼容性**：可与 Dust 画质增强 mod 及其他 RE_Kenshi 插件双开同用
 
 ### 环境要求
 
@@ -36,7 +38,7 @@
 需要 Visual Studio 2019+（安装 v100 x64 工具链）、Boost 1.60.0、KenshiLib 依赖（见 `reference/`）。
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File toolsuild.ps1
+powershell -ExecutionPolicy Bypass -File tools\build.ps1
 ```
 
 产物自动复制到 `mods/KenshiTrainer/`。仅支持 Release|x64。
@@ -70,8 +72,10 @@ An in-game trainer plugin for Kenshi built on [RE_Kenshi](https://github.com/BFr
   - Weapons: linked manufacturer/model pickers, numeric level or quality grade (mid-grade .. meitou)
   - Armour/crossbows: six quality tiers (prototype .. masterwork) plus fine-grained level
   - Spawns into the selected character's backpack; drops on the ground when full (never lost)
-- **Building placement bypass**: disables the placement validity check (slope / overlap / indoors no longer block); preview colour stays truthful so you can place anywhere
+- **Medical**: amputate / install prosthetics (full limb database, quality tier selector, auto by default) / restore original limbs at full health; replaced or removed limbs return to the backpack
+- **Building placement bypass**: disables the placement validity check (slope / overlap / indoors no longer block); preview colour stays truthful so you can place anywhere (has known unfixed bugs)
 - **Bilingual UI**: follows the current game language
+- **Compatibility**: runs alongside the Dust graphics mod and other RE_Kenshi plugins
 
 ### Requirements
 
@@ -90,7 +94,7 @@ An in-game trainer plugin for Kenshi built on [RE_Kenshi](https://github.com/BFr
 Visual Studio 2019+ with the v100 x64 toolset, Boost 1.60.0 and the KenshiLib deps (see `reference/`).
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File toolsuild.ps1
+powershell -ExecutionPolicy Bypass -File tools\build.ps1
 ```
 
 Output is copied to `mods/KenshiTrainer/`. Release|x64 only.

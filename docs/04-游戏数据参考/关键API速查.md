@@ -113,7 +113,7 @@ inv->addItem(item, quantity);                          // 自动找位置堆叠
 ## 五、待验证事项（开发时实测清单）
 
 - [ ] `getStatRef` 写入后是否被升级/经验系统回写（是否需要 hook 经验结算）
-- [ ] GameDataManager 全局实例的稳妥获取路径（`ou->` 链或 GameWorld 成员）
-- [ ] createItem 简化版对武器/护甲的品质默认值；levelOverride 取值范围
+- [ ] ~~GameDataManager 全局实例的稳妥获取路径~~ ✅ 已确认：`ou->gamedata`（GameWorld 成员）
+- [ ] ~~createItem 简化版对武器/护甲的品质默认值~~ ✅ 已确认：必须传型号 GameData（MATERIAL_SPECS_WEAPON）作为 matData，否则读档品质回退开顿城1号——详见同目录《武器品质与存档序列化》
 - [ ] 背包满时 addItem 的失败行为；建议 UI 提示"背包已满，已掉落地面"
 - [ ] MyGUI 在 1.0.68 兼容 exe 下的皮肤名是否一致
