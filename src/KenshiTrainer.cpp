@@ -1076,6 +1076,16 @@ static bool SafeAmputate(Character* c, int limb)
     __except (EXCEPTION_EXECUTE_HANDLER) { return false; }
 }
 
+// vanilla limb GUI parity: installing consumes the item from the backpack
+// (verified by disasm - neither MedicalSystem::setRobotLimbItem (Kenshi
+// 1.0.65 RVA 0x644C00) nor HealthPartStatus::setRobotLimbItem (0x643B20)
+// touches the inventory; the GUI does the removal itself)
+static bool SafeRemoveItemNoDestroy(Inventory* inv, Item* item)
+{
+    __try { return inv->removeItemDontDestroy_returnsItem(item, 1, false) != NULL; }
+    __except (EXCEPTION_EXECUTE_HANDLER) { return false; }
+}
+
 static bool SafeAttachProsthetic(Character* c, int limb, GameData* gd, int level)
 {
     // the game's install path expects the RobotLimbItem to be in the
@@ -1087,30 +1097,56 @@ static bool SafeAttachProsthetic(Character* c, int limb, GameData* gd, int level
     Inventory* inv = SafeGetCharInventory(c);
     if (inv)
         SafeAddItem(inv, item, 1);
+    RobotLimbItem* old = NULL;
     __try
     {
         MedicalSystem* m = c->getMedical();
         if (!m) return false;
+        // grab the currently installed prosthetic before the install
+        // overwrites the slot (replace case) - it goes back to the backpack
+        MedicalSystem::HealthPartStatus* part = m->getPart((RobotLimbs::Limb)limb);
+        if (part)
+            old = part->robotLimb;
         m->setRobotLimbItem((RobotLimbs::Limb)limb, item, false);
-        return true;
     }
     __except (EXCEPTION_EXECUTE_HANDLER) { return false; }
+    // the item now lives on the limb (HealthPartStatus::robotLimb); take it
+    // out of the backpack or it shows up in both places
+    if (inv)
+        SafeRemoveItemNoDestroy(inv, item);
+    if (old && old != (RobotLimbItem*)item && inv)
+        SafeAddItem(inv, old, 1);
+    return true;
 }
 
 static bool SafeRestoreLimb(Character* c, int limb)
 {
+    RobotLimbItem* old = NULL;
     __try
     {
         MedicalSystem* m = c->getMedical();
         if (!m) return false;
         if (m->getLimbState((RobotLimbs::Limb)limb) == LIMB_REPLACED)
+        {
+            MedicalSystem::HealthPartStatus* part = m->getPart((RobotLimbs::Limb)limb);
+            if (part)
+                old = part->robotLimb; // grab before detach clears the slot
             m->setRobotLimbItem((RobotLimbs::Limb)limb, NULL, false); // detach prosthetic
+        }
         if (m->robotLimbs)
             m->robotLimbs->setLimb((RobotLimbs::Limb)limb, LIMB_ORIGINAL, NULL);
-        SafeHealAfterLimbOp(c, limb); // restored limb comes back at FULL hp
-        return true;
     }
     __except (EXCEPTION_EXECUTE_HANDLER) { return false; }
+    // vanilla parity: uninstalling a prosthetic returns it to the backpack
+    // (SafeAddItem drops it on the ground if the backpack is full)
+    if (old)
+    {
+        Inventory* inv = SafeGetCharInventory(c);
+        if (inv)
+            SafeAddItem(inv, old, 1);
+    }
+    SafeHealAfterLimbOp(c, limb); // restored limb comes back at FULL hp
+    return true;
 }
 
 static int g_selProsthetic[4] = { 0, 0, 0, 0 };
