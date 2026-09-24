@@ -669,6 +669,142 @@ static DWORD WINAPI SwapChainScanner(LPVOID)
     return 0;
 }
 
+
+// ---------------------------------------------------------------------------
+// OGRE-internal swapchain discovery (Dust coexistence path).
+//
+// When Dust owns the dxgi creation hooks we must not touch them (shared
+// KenshiLib AddHook on the same dxgi export = nondeterministic crash). Instead
+// the swapchain pointer is read straight out of the game's own OGRE objects:
+// no hooks, no patches, pure SEH-guarded pointer reads from a poll thread.
+//
+// Offsets reverse-engineered from the shipped DLLs (2026-09-24, all
+// disassembly/export/RTTI cross-verified):
+//   OgreMain_x64.dll (Ogre 2.x):
+//     +0x909B20  Ogre::Singleton<Ogre::Root>::msSingleton  (ctor store at
+//                0x4C090 + getSingletonPtr load + export ?msSingleton@...)
+//     +0x8D9F40  Ogre::WindowEventUtilities::_msWindows    (export-confirmed;
+//                vector<RenderWindow*>, begin/end/cap verified in the
+//                push_back impl of _addRenderWindow and in _removeRenderWindow)
+//     Root+0x168 = Root::mAutoWindow (getAutoCreatedWindow disasm)
+//   RenderSystem_Direct3D11_x64.dll:
+//     +0x7C548   Ogre::D3D11RenderWindowHwnd vtable (RTTI COL walk)
+//     window+0x130 = D3D11RenderWindowSwapChainBased::mpSwapChain, verified at
+//                3 sites: destroy -> SetFullscreenState+Release, backbuffer
+//                GetBuffer(0) copy, swapBuffers -> Present (vtable slot 8)
+// ---------------------------------------------------------------------------
+
+static const DWORD64 OGRE_RVA_MS_WINDOWS     = 0x8D9F40;
+static const DWORD64 OGRE_RVA_ROOT_SINGLETON = 0x909B20;
+static const DWORD64 ROOT_OFF_AUTO_WINDOW    = 0x168;
+static const DWORD64 RS_RVA_HWND_VTABLE      = 0x7C548;
+static const DWORD64 RWND_OFF_SWAPCHAIN      = 0x130;
+
+// SEH-guarded 8-byte read; POD locals only (C2712)
+static bool SafeReadPtr(const void* addr, void** out)
+{
+    __try
+    {
+        *out = *(void* const*)addr;
+        return true;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return false;
+    }
+}
+
+// the exact vtable match guarantees the shipped RenderSystem build, which in
+// turn guarantees the +0x130 mpSwapChain offset
+static IDXGISwapChain* SwapChainFromWindow(void* wnd, void* wantVt, DWORD64 dxgiBase, DWORD64 dxgiEnd)
+{
+    void* vt = NULL;
+    if (!SafeReadPtr(wnd, &vt) || vt != wantVt)
+        return NULL;
+    void* sc = NULL;
+    if (!SafeReadPtr((char*)wnd + RWND_OFF_SWAPCHAIN, &sc) || !sc)
+        return NULL;
+    if (!ValidateSwapChainCandidate((IDXGISwapChain*)sc, dxgiBase, dxgiEnd))
+        return NULL;
+    return (IDXGISwapChain*)sc;
+}
+
+static IDXGISwapChain* OgreFindSwapChain(DWORD64 dxgiBase, DWORD64 dxgiEnd)
+{
+    HMODULE ogre = GetModuleHandleA("OgreMain_x64.dll");
+    HMODULE rs = GetModuleHandleA("RenderSystem_Direct3D11_x64.dll");
+    if (!ogre || !rs)
+        return NULL;
+    void* wantVt = (char*)rs + RS_RVA_HWND_VTABLE;
+
+    // primary: every created render window registers in _msWindows
+    void* vbegin = NULL;
+    void* vend = NULL;
+    if (SafeReadPtr((const char*)ogre + OGRE_RVA_MS_WINDOWS, &vbegin) &&
+        SafeReadPtr((const char*)ogre + OGRE_RVA_MS_WINDOWS + 8, &vend) &&
+        vbegin && vend && vend > vbegin &&
+        ((const char*)vend - (const char*)vbegin) <= (ptrdiff_t)(64 * sizeof(void*)))
+    {
+        size_t count = ((const char*)vend - (const char*)vbegin) / sizeof(void*);
+        for (size_t i = 0; i < count; ++i)
+        {
+            void* wnd = NULL;
+            if (!SafeReadPtr((const char*)vbegin + i * sizeof(void*), &wnd) || !wnd)
+                continue;
+            IDXGISwapChain* sc = SwapChainFromWindow(wnd, wantVt, dxgiBase, dxgiEnd);
+            if (sc)
+                return sc;
+        }
+    }
+
+    // fallback: Root singleton -> mAutoWindow
+    void* root = NULL;
+    void* rootVt = NULL;
+    if (SafeReadPtr((const char*)ogre + OGRE_RVA_ROOT_SINGLETON, &root) && root &&
+        SafeReadPtr(root, &rootVt) &&
+        (DWORD64)rootVt >= (DWORD64)ogre &&
+        (DWORD64)rootVt < (DWORD64)ogre + 0x1000000) // inside OgreMain image
+    {
+        void* wnd = NULL;
+        if (SafeReadPtr((const char*)root + ROOT_OFF_AUTO_WINDOW, &wnd) && wnd)
+        {
+            IDXGISwapChain* sc = SwapChainFromWindow(wnd, wantVt, dxgiBase, dxgiEnd);
+            if (sc)
+                return sc;
+        }
+    }
+    return NULL;
+}
+
+// polls until the game swapchain exists (created well after plugin load), then
+// hands it to OnSwapChain; keeps polling afterwards so a recreated swapchain
+// (fullscreen toggle etc.) is picked up as well
+static DWORD WINAPI OgreSwapChainWatch(LPVOID)
+{
+    DebugLog("KenshiTrainer: OGRE swapchain watch started (Dust coexistence)");
+    IDXGISwapChain* lastSeen = NULL;
+    for (;;)
+    {
+        HMODULE dxgi = GetModuleHandleA("dxgi.dll");
+        DWORD64 dxgiBase = dxgi ? (DWORD64)dxgi : 0;
+        DWORD64 dxgiSize = dxgi ? DxgiModuleSize(dxgi) : 0;
+        if (dxgiBase && dxgiSize)
+        {
+            IDXGISwapChain* sc = OgreFindSwapChain(dxgiBase, dxgiBase + dxgiSize);
+            if (sc && sc != lastSeen)
+            {
+                char db[128];
+                sprintf_s(db, "KenshiTrainer: swapchain found via OGRE internals: %p", (void*)sc);
+                DebugLog(db);
+                OnSwapChain(sc); // shadow-hook Present + select as game swapchain
+                lastSeen = sc;
+            }
+        }
+        Sleep(500);
+    }
+    return 0;
+}
+
 // ---------------------------------------------------------------------------
 // Dust coexistence, bisect root cause: two modules AddHook-ing the SAME dxgi
 // export (D3D11CreateDeviceAndSwapChain / CreateSwapChain / CreateSwapChainForHwnd)
@@ -778,8 +914,11 @@ static void LateHookDecision()
     {
         // sharing the dxgi-export hooks with Dust crashes at init (race); the
         // game factory also predates us, so the swapchain cannot be captured
-        // late. Stay dormant instead of killing the game.
-        DebugLog("KenshiTrainer: Dust detected - dxgi creation hooks skipped, overlay dormant (coexistence mode)");
+        // by hooking. Instead read it out of OGRE's own objects (pure reads).
+        DebugLog("KenshiTrainer: Dust detected - dxgi creation hooks skipped, using OGRE-internal swapchain discovery");
+        HANDLE ot = CreateThread(NULL, 0, &OgreSwapChainWatch, NULL, 0, NULL);
+        if (ot)
+            CloseHandle(ot);
         return;
     }
     InstallLegacyCreationHooks();
