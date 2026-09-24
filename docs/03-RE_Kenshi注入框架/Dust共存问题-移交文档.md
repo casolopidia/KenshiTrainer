@@ -94,4 +94,8 @@ KenshiTrainer（本仓库，RE_Kenshi/KenshiLib 插件）与 Dust（创意工坊
 
 预期日志序列（双开）：`Dust detected - ... using OGRE-internal swapchain discovery` → `OGRE swapchain watch started` → `swapchain found via OGRE internals: 0x...` → `Present shadow-hooked on swapchain`（可能出现 `shadow vtable resynced`）。
 
-**待游戏内验证**：双开时修改器界面可用且 Dust 全功能；单开回归（legacy 路径未动）。验证通过后更新 docs/08 发布说明。
+**游戏内验证已通过（2026-09-24，双开 155s+）**：日志序列完全符合预期——`swapchain found via OGRE internals: 0000000059268700` 与 DustBoot `Captured swap chain` 指针**完全一致**（指针链全程无误差）；Dust 全功能（16 效果插件 + DLSS + Present #7777+ 递增），修改器 UI 正常刷物品/装义肢。挂钩顺序：我们先装 shadow（5.67s），Dust 后写 vtable（26.45s）——Dust 读到的 vptr 已是我们的 shadow，其 detour 直接写进 shadow，形成 game→Dust→我们→真实 Present 的天然链，未触发 resync（活表从未变化）。
+
+**重要附带发现（逆向必备）**：实际运行的 exe 是 `RE_Kenshi\Kenshi_x64.exe`（Kenshi 1.0.65，RE_Kenshi 安装器换入的兼容版），**不是**游戏根目录的 kenshi_x64.exe（1.0.68，36,718,592 字节 vs 36,713,984 字节）。KenshiLib 头文件注释里的 RVA 对不上运行版 exe；真实映射 = KenshiLib.dll 导出桩序号（FUNC_BEGIN=0x15B46 起每桩 6 字节）→ `RE_Kenshi\RVAs\Steam_1.0.65.br`（原始 uint32 数组，非 brotli）按同序填 function_pointers（槽基址 0xD7000，每槽 8 字节）。例：setRobotLimbItem 桩 0x1CD22 → 索引 4858 → 表值 0x644C00（在 RE_Kenshi\Kenshi_x64.exe 中反汇编为干净函数头，robotLimbs@0xC8 与头文件一致）。逆向游戏代码一律用 `RE_Kenshi\Kenshi_x64.exe`。
+
+**义肢背包重复 bug 修复（commit 219bec8）**：根因——`MedicalSystem::setRobotLimbItem`(0x644C00) 与 `HealthPartStatus::setRobotLimbItem`(0x643B20) 都不碰背包（原版由四肢 GUI 自行移除），我们先加背包再安装导致双重持有。修复：安装成功后 `removeItemDontDestroy_returnsItem` 移出背包；换装时旧义肢（`HealthPartStatus::robotLimb`@+0x28，头文件已证实）退回背包；恢复肢体时拆下的义肢退回背包（原版行为）。待游戏内验证。
