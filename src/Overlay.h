@@ -4,5 +4,6 @@
 void Overlay_Init();
 
 // implemented in KenshiTrainer.cpp
+void Trainer_LoadSettings(const char* directory);
 void DrawTrainerUI();
 bool Trainer_MenuOpen();

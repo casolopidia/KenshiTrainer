@@ -44,10 +44,15 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <float.h>
+#include <cmath>
 
 #include "StatNames.h"      // TR_STATS (needs Enums.h first)
 #include "ChineseStrings.h" // TR::* UTF-8 hex-escaped strings
+#include "ProstheticNames.h" // CN/EN limb-name tokens, also UTF-8 hex escaped
 #include "Overlay.h"
+#include "ExperienceMultiplier.h"
+#include "PhysiqueControl.h"
 
 bool g_trChinese = false; // UI language: true = Chinese, false = English (default)
 #include "BuildBypass.h"
@@ -715,8 +720,7 @@ static void SelectItem(GameData* gd)
     g_variants.clear();
     g_selCompany = 0;
     g_selVariant = 0;
-    g_weaponLevel = 0;   // weapon grade 0..100, 0 = game default
-    g_gearLevel = -1;    // armour/crossbow grade 0..100, -1 = auto
+    // Keep the user's grade preferences when changing items or categories.
     if (!gd || !ou)
         return;
 
@@ -897,6 +901,9 @@ static char        g_statEdit[64][16] = { 0 };
 static bool        g_statsDirty = true; // refill g_statVals on next draw
 static int         g_headerTimer = 0;
 static bool        g_cursorHidden = false;
+static int         g_xpPercent = 100;
+static int         g_xpPlayer = 1;
+static int         g_xpAI = 0;
 
 static void SetStatus(const std::string& msg)
 {
@@ -904,6 +911,16 @@ static void SetStatus(const std::string& msg)
     DebugLog(std::string("KenshiTrainer: ") + msg);
 }
 
+static float NumericInputWidth(float minimum, bool stepButtons)
+{
+    const ImGuiStyle& style = ImGui::GetStyle();
+    // Reserve room for four digits, a sign, decimals and the input cursor.
+    float width = ImGui::CalcTextSize("-9999.99").x
+        + style.FramePadding.x * 2.0f + ImGui::CalcTextSize("0").x;
+    if (stepButtons)
+        width += (ImGui::GetFrameHeight() + style.ItemInnerSpacing.x) * 2.0f;
+    return width > minimum ? width : minimum;
+}
 static void DrawBuildTab()
 {
     bool bypass = BuildBypass_Enabled();
@@ -915,15 +932,44 @@ static void DrawBuildTab()
     ImGui::TextUnformatted(TR(HINT_BUILD_BYPASS));
 }
 
+static void DrawExperienceTab()
+{
+    ImGui::TextWrapped("%s", TR(HINT_XP));
+    if (!ExperienceMultiplier_Ready())
+    {
+        ImGui::TextWrapped("%s", TR(XP_UNAVAILABLE));
+        return;
+    }
+    float multiplier = g_xpPercent / 100.0f;
+    ImGui::SetNextItemWidth(NumericInputWidth(180.0f, true));
+    if (ImGui::InputFloat(TR(LBL_XP_MULTIPLIER), &multiplier, 0.1f, 1.0f, "%.2f"))
+    {
+        if (!_finite(multiplier)) multiplier = 1.0f;
+        if (multiplier < 0.0f) multiplier = 0.0f;
+        if (multiplier > 1000.0f) multiplier = 1000.0f;
+        g_xpPercent = (int)(multiplier * 100.0f + 0.5f);
+    }
+    ImGui::TextUnformatted(TR(LBL_XP_SCOPE));
+    bool player = g_xpPlayer != 0;
+    bool ai = g_xpAI != 0;
+    if (ImGui::Checkbox(TR(LBL_XP_PLAYER), &player))
+        g_xpPlayer = player ? 1 : 0;
+    if (ImGui::Checkbox(TR(LBL_XP_AI), &ai))
+        g_xpAI = ai ? 1 : 0;
+    if (ImGui::Button(TR(BTN_XP_RESET)))
+        g_xpPercent = 100;
+    ImGui::TextWrapped("%s", TR(HINT_XP_AI));
+    ExperienceMultiplier_Configure(g_xpPercent, g_xpPlayer != 0, g_xpAI != 0);
+}
+
 // ---------------------------------------------------------------------------
 // Medical / prosthetic limbs
 //
 // Prosthetics live in the runtime DB as GameData of type LIMB_REPLACEMENT
-// (NOT ITEM - that is why the item spawner never lists them). Vanilla flow:
-// the limb must be severed first (MedicalSystem::amputate), then a
+// (NOT ITEM - that is why the item spawner never lists them). A
 // RobotLimbItem is installed through MedicalSystem::setRobotLimbItem (this
-// is what the game's own limb GUI calls). Restore = RobotLimbs::setLimb back
-// to LIMB_ORIGINAL + refill the flesh part.
+// is what the game's own limb GUI calls). Direct install/replacement is
+// supported; Restore = RobotLimbs::setLimb back to LIMB_ORIGINAL + refill.
 // ---------------------------------------------------------------------------
 static std::vector<GameData*> g_limbItems;
 static bool                   g_limbCacheBuilt = false;
@@ -949,10 +995,32 @@ static void SafeLogLimbKeys(GameData* gd)
     __except (EXCEPTION_EXECUTE_HANDLER) {}
 }
 
-// which limb a prosthetic fits; -1 = unknown (then shown for every limb)
-static bool GuessLimbSide(GameData* gd, int* side)
+// A prosthetic must be positively identified as fitting the target limb.
+// Unknown items are rejected rather than offered for all four slots.
+static bool ContainsAnyToken(const std::string& name, const char* const* tokens)
 {
-    static const char* keys[] = { "limb type", "limb", "which limb", "side", NULL };
+    for (int i = 0; tokens[i]; ++i)
+        if (name.find(tokens[i]) != std::string::npos)
+            return true;
+    return false;
+}
+
+static bool ResolveLimbSideImpl(GameData* gd, int* side)
+{
+    // Prefer an explicit descriptive name over ambiguous legacy keys such
+    // as "side" (0/1 alone cannot distinguish an arm from a leg). GameData
+    // names are localized, so accept both English and Simplified Chinese.
+    std::string name = ToLower(gd->name);
+    bool left = ContainsAnyToken(name, PROSTHETIC_LEFT_TOKENS);
+    bool right = ContainsAnyToken(name, PROSTHETIC_RIGHT_TOKENS);
+    bool arm = ContainsAnyToken(name, PROSTHETIC_ARM_TOKENS);
+    bool leg = ContainsAnyToken(name, PROSTHETIC_LEG_TOKENS);
+    if (left != right && arm != leg)
+    {
+        *side = (arm ? 0 : 2) + (right ? 1 : 0);
+        return true;
+    }
+    static const char* keys[] = { "limb type", "limb", "which limb", NULL };
     for (int i = 0; keys[i]; ++i)
     {
         std::string k(keys[i]);
@@ -960,6 +1028,18 @@ static bool GuessLimbSide(GameData* gd, int* side)
         if (SafeGetIData(gd, &k, &v) && v >= 0 && v <= 3) { *side = v; return true; }
     }
     return false;
+}
+
+static bool GuessLimbSide(GameData* gd, int* side)
+{
+    __try { return ResolveLimbSideImpl(gd, side); }
+    __except (EXCEPTION_EXECUTE_HANDLER) { return false; }
+}
+
+static bool IsLimbCompatible(GameData* gd, int limb)
+{
+    int side = -1;
+    return gd && limb >= 0 && limb < 4 && GuessLimbSide(gd, &side) && side == limb;
 }
 
 static void EnsureLimbCache()
@@ -977,8 +1057,18 @@ static void EnsureLimbCache()
                 g_limbItems.push_back(list[i]);
     }
     std::sort(g_limbItems.begin(), g_limbItems.end(), GameDataNameLess);
-    char buf[96];
-    sprintf_s(buf, "KenshiTrainer: prosthetic items loaded: %d", (int)g_limbItems.size());
+    int compatible[4] = { 0, 0, 0, 0 };
+    for (size_t i = 0; i < g_limbItems.size(); ++i)
+    {
+        int side = -1;
+        if (GuessLimbSide(g_limbItems[i], &side))
+            ++compatible[side];
+        else
+            DebugLog(std::string("KenshiTrainer: prosthetic compatibility unknown: ") + g_limbItems[i]->name);
+    }
+    char buf[200];
+    sprintf_s(buf, "KenshiTrainer: prosthetic items loaded: %d; compatible LA=%d RA=%d LL=%d RL=%d",
+        (int)g_limbItems.size(), compatible[0], compatible[1], compatible[2], compatible[3]);
     DebugLog(buf);
     if (!g_limbItems.empty())
         SafeLogLimbKeys(g_limbItems[0]);
@@ -1178,6 +1268,11 @@ static void DoAttachProsthetic(int limb)
         return;
     }
     GameData* gd = g_limbItems[sel];
+    if (!IsLimbCompatible(gd, limb))
+    {
+        SetStatus(TR(MSG_LIMB_INCOMPATIBLE));
+        return;
+    }
     if (SafeAttachProsthetic(c, limb, gd, g_limbGrade))
     {
         char buf[300];
@@ -1202,6 +1297,359 @@ static void DoRestoreLimb(int limb)
         SetStatus(TR(MSG_LIMB_FAIL));
 }
 
+struct MedicalPartValue
+{
+    GameData* data;
+    float current;
+    float maximum;
+    bool editable;
+};
+
+static int SafeMedicalPartCount(Character* c)
+{
+    __try
+    {
+        MedicalSystem* medical = c->getMedical();
+        int count = medical ? medical->getPartCount() : 0;
+        return count >= 0 && count <= 256 ? count : 0;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER) { return 0; }
+}
+
+static bool ReadMedicalPartImpl(Character* c, int index, MedicalPartValue* value, std::string* name)
+{
+    MedicalSystem* medical = c->getMedical();
+    if (!medical || index < 0 || index >= medical->getPartCount())
+        return false;
+    MedicalSystem::HealthPartStatus* part = medical->getPart((unsigned __int64)index);
+    if (!part || !part->data)
+        return false;
+    value->data = part->data;
+    value->current = part->flesh - part->fleshStun;
+    value->maximum = part->maxHealth();
+    RobotLimbs::Limb limb = part->getRobotLimbEnum();
+    LimbState state = limb != RobotLimbs::NULL_LIMB ? medical->getLimbState(limb) : LIMB_ORIGINAL;
+    value->editable = state == LIMB_ORIGINAL || state == LIMB_REPLACED;
+    *name = part->data->name;
+    if (limb >= RobotLimbs::LEFT_ARM && limb <= RobotLimbs::RIGHT_LEG)
+        *name = LimbName((int)limb);
+    else if (part->whatAmI == MedicalSystem::HealthPartStatus::PART_HEAD)
+        *name = TR(PART_HEAD);
+    else if (ToLower(*name) == "chest")
+        *name = TR(PART_CHEST);
+    else if (ToLower(*name) == "stomach")
+        *name = TR(PART_STOMACH);
+    return _finite(value->current) && _finite(value->maximum) && value->maximum > 0.0f;
+}
+
+static bool SafeReadMedicalPart(Character* c, int index, MedicalPartValue* value, std::string* name)
+{
+    __try { return ReadMedicalPartImpl(c, index, value, name); }
+    __except (EXCEPTION_EXECUTE_HANDLER) { return false; }
+}
+
+static bool SafeSetPartHealth(Character* c, int index, GameData* expected, float amount,
+    float requestedMax, bool full, float* before, float* after, float* maximum)
+{
+    __try
+    {
+        MedicalSystem* medical = c->getMedical();
+        if (!medical || index < 0 || index >= medical->getPartCount())
+            return false;
+        MedicalSystem::HealthPartStatus* part = medical->getPart((unsigned __int64)index);
+        if (!part || part->data != expected)
+            return false;
+        RobotLimbs::Limb limb = part->getRobotLimbEnum();
+        if (limb != RobotLimbs::NULL_LIMB)
+        {
+            LimbState state = medical->getLimbState(limb);
+            if (state != LIMB_ORIGINAL && state != LIMB_REPLACED)
+                return false;
+        }
+        *maximum = part->maxHealth();
+        if (!_finite(*maximum) || *maximum <= 0.0f)
+            return false;
+        float targetMax = *maximum;
+        float newBase = part->_maxHealth;
+        if (requestedMax > 0.0f)
+        {
+            // Steam 1.0.65: maxHealth = age * _maxHealth * HPMult - wearDamage.
+            // Edit the base field so race/age multipliers and prosthetic wear
+            // retain their normal effect instead of being overwritten.
+            float factor = part->age * part->HPMult;
+            if (!_finite(factor) || factor <= 0.0f)
+                return false;
+            newBase = (requestedMax + part->wearDamage) / factor;
+            if (!_finite(newBase) || newBase <= 0.0f)
+                return false;
+            targetMax = requestedMax;
+        }
+        if (full) amount = targetMax;
+        if (!_finite(amount) || amount < -targetMax || amount > targetMax)
+            return false;
+        *before = part->flesh - part->fleshStun;
+        if (requestedMax > 0.0f)
+            part->_maxHealth = newBase;
+        part->flesh = amount;
+        part->fleshStun = 0.0f;
+        part->juryRigging = 0.0f;
+        // Retain existing bandaging only up to the remaining wound. Do not
+        // change race/age HP multipliers or remove prosthetic wear damage.
+        float wound = targetMax - amount;
+        if (part->bandaging > wound) part->bandaging = wound;
+        part->updateDerivedHealths();
+        medical->reassessCollapseMode(true, false);
+        *after = part->flesh - part->fleshStun;
+        *maximum = part->maxHealth();
+        return _finite(*after) && fabsf(*after - amount) < 0.05f &&
+            _finite(*maximum) && fabsf(*maximum - targetMax) < 0.05f;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER) { return false; }
+}
+
+static bool ApplyPartHealth(Character* c, int index, GameData* expected, const char* text,
+    const char* maxText, bool full)
+{
+    char* end = NULL;
+    double parsed = full ? 0.0 : strtod(text, &end);
+    if (!full && (end == text || *end != '\0' || !_finite(parsed) || parsed < -FLT_MAX || parsed > FLT_MAX))
+    {
+        SetStatus(TR(MSG_BAD_VALUE));
+        return false;
+    }
+    double parsedMax = 0.0;
+    if (!full)
+    {
+        char* maxEnd = NULL;
+        parsedMax = strtod(maxText, &maxEnd);
+        if (maxEnd == maxText || *maxEnd != '\0' || !_finite(parsedMax) ||
+            parsedMax <= 0.0 || parsedMax > 1000000.0)
+        {
+            SetStatus(TR(MSG_BAD_MAX_VALUE));
+            return false;
+        }
+    }
+    float before = 0.0f, after = 0.0f, maximum = 0.0f;
+    bool ok = SafeSetPartHealth(c, index, expected, (float)parsed, (float)parsedMax,
+        full, &before, &after, &maximum);
+    char log[220];
+    sprintf_s(log, "KenshiTrainer: part health character=%p part=%d full=%d requested=%.2f requestedMax=%.2f before=%.2f after=%.2f max=%.2f result=%s",
+        c, index, full ? 1 : 0, (float)parsed, (float)parsedMax, before, after, maximum, ok ? "ok" : "failed");
+    DebugLog(log);
+    SetStatus(ok ? TR(MSG_HEALTH_OK) : TR(MSG_HEALTH_FAIL));
+    return ok;
+}
+
+static bool SafeReadBlood(Character* c, float* current, float* maximum)
+{
+    __try
+    {
+        MedicalSystem* medical = c->getMedical();
+        if (!medical) return false;
+        *current = medical->blood;
+        *maximum = medical->getMaxBlood();
+        return _finite(*current) && _finite(*maximum) && *maximum > 0.0f;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER) { return false; }
+}
+
+static bool SafeSetBlood(Character* c, float amount, bool full, float* after, float* maximum)
+{
+    __try
+    {
+        MedicalSystem* medical = c->getMedical();
+        if (!medical) return false;
+        *maximum = medical->getMaxBlood();
+        if (!_finite(*maximum) || *maximum <= 0.0f) return false;
+        if (full) amount = *maximum;
+        if (!_finite(amount) || amount < -*maximum || amount > *maximum) return false;
+        medical->blood = amount;
+        medical->reassessCollapseMode(true, false);
+        *after = medical->blood;
+        return _finite(*after) && fabsf(*after - amount) < 0.05f;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER) { return false; }
+}
+
+static bool ApplyBlood(Character* c, const char* text, bool full)
+{
+    char* end = NULL;
+    double parsed = full ? 0.0 : strtod(text, &end);
+    if (!full && (end == text || *end != '\0' || !_finite(parsed) || parsed < -FLT_MAX || parsed > FLT_MAX))
+    {
+        SetStatus(TR(MSG_BAD_VALUE));
+        return false;
+    }
+    float after = 0.0f, maximum = 0.0f;
+    bool ok = SafeSetBlood(c, (float)parsed, full, &after, &maximum);
+    char log[180];
+    sprintf_s(log, "KenshiTrainer: blood character=%p full=%d requested=%.2f after=%.2f max=%.2f result=%s",
+        c, full ? 1 : 0, (float)parsed, after, maximum, ok ? "ok" : "failed");
+    DebugLog(log);
+    SetStatus(ok ? TR(MSG_BLOOD_OK) : TR(MSG_BLOOD_FAIL));
+    return ok;
+}
+
+static void DrawBloodEditor(Character* c, bool refresh)
+{
+    static Character* previous = NULL;
+    static char edit[48] = { 0 };
+    float current = 0.0f, maximum = 0.0f;
+    if (!SafeReadBlood(c, &current, &maximum))
+    {
+        previous = NULL;
+        ImGui::TextUnformatted(TR(MSG_HEALTH_UNAVAILABLE));
+        return;
+    }
+    if (previous != c || refresh || !edit[0])
+    {
+        previous = c;
+        sprintf_s(edit, "%.2f", current);
+    }
+    ImGui::TextWrapped("%s", TR(HINT_BLOOD));
+    ImGui::Text("%s %.1f / %.1f", TR(LBL_BLOOD), current, maximum);
+    ImGui::SetNextItemWidth(NumericInputWidth(160.0f, true));
+    ImGui::InputText("##blood", edit, sizeof(edit), ImGuiInputTextFlags_CharsDecimal);
+    ImGui::SameLine();
+    if (ImGui::SmallButton(TR(BTN_SET)))
+    {
+        if (ApplyBlood(c, edit, false) && SafeReadBlood(c, &current, &maximum))
+            sprintf_s(edit, "%.2f", current);
+    }
+    ImGui::SameLine();
+    if (ImGui::SmallButton(TR(BTN_HEALTH_FULL)))
+    {
+        if (ApplyBlood(c, edit, true) && SafeReadBlood(c, &current, &maximum))
+            sprintf_s(edit, "%.2f", current);
+    }
+    ImGui::Separator();
+}
+
+static void DrawPartHealthEditor(Character* c, bool refresh)
+{
+    static Character* previous = NULL;
+    static GameData* partData[256] = { 0 };
+    static char edit[256][48] = { 0 };
+    static char maxEdit[256][48] = { 0 };
+    if (previous != c || refresh)
+    {
+        previous = c;
+        memset(partData, 0, sizeof(partData));
+    }
+    ImGui::TextWrapped("%s", TR(HINT_PART_HEALTH));
+    int count = SafeMedicalPartCount(c);
+    if (!count)
+        ImGui::TextUnformatted(TR(MSG_HEALTH_UNAVAILABLE));
+    if (!ImGui::BeginTable("##parthealth", 5, ImGuiTableFlags_SizingStretchProp))
+        return;
+    ImGui::TableSetupColumn(TR(LBL_BODY_PART), ImGuiTableColumnFlags_WidthStretch, 0.9f);
+    ImGui::TableSetupColumn(TR(LBL_CURRENT_MAX), ImGuiTableColumnFlags_WidthStretch, 1.1f);
+    ImGui::TableSetupColumn(TR(LBL_TARGET_HP), ImGuiTableColumnFlags_WidthStretch, 1.0f);
+    ImGui::TableSetupColumn(TR(LBL_TARGET_MAX), ImGuiTableColumnFlags_WidthStretch, 1.0f);
+    ImGui::TableSetupColumn(TR(LBL_ACTION), ImGuiTableColumnFlags_WidthFixed, 125.0f);
+    ImGui::TableHeadersRow();
+    ImGui::PushID((const void*)c);
+    for (int index = 0; index < count; ++index)
+    {
+        MedicalPartValue value;
+        std::string name;
+        if (!SafeReadMedicalPart(c, index, &value, &name))
+            continue;
+        if (partData[index] != value.data)
+        {
+            partData[index] = value.data;
+            sprintf_s(edit[index], "%.2f", value.current);
+            sprintf_s(maxEdit[index], "%.2f", value.maximum);
+        }
+        ImGui::PushID(index);
+        ImGui::TableNextRow();
+        ImGui::TableNextColumn();
+        ImGui::TextUnformatted(name.c_str());
+        ImGui::TableNextColumn();
+        ImGui::Text("%.1f / %.1f", value.current, value.maximum);
+        ImGui::TableNextColumn();
+        ImGui::BeginDisabled(!value.editable);
+        ImGui::SetNextItemWidth(-1.0f);
+        // Buffer is updated on every keystroke; only an explicit button writes
+        // to the game, including when Apply takes focus away from the field.
+        ImGui::InputText("##health", edit[index], sizeof(edit[index]), ImGuiInputTextFlags_CharsDecimal);
+        ImGui::TableNextColumn();
+        ImGui::SetNextItemWidth(-1.0f);
+        ImGui::InputText("##maxhealth", maxEdit[index], sizeof(maxEdit[index]), ImGuiInputTextFlags_CharsDecimal);
+        ImGui::TableNextColumn();
+        if (ImGui::SmallButton(TR(BTN_SET)))
+            ApplyPartHealth(c, index, value.data, edit[index], maxEdit[index], false);
+        ImGui::SameLine();
+        if (ImGui::SmallButton(TR(BTN_HEALTH_FULL)))
+        {
+            if (ApplyPartHealth(c, index, value.data, edit[index], NULL, true))
+                sprintf_s(edit[index], "%.2f", value.maximum);
+        }
+        ImGui::EndDisabled();
+        ImGui::PopID();
+    }
+    ImGui::PopID();
+    ImGui::EndTable();
+}
+
+static void DrawPhysiqueEditor(Character* c)
+{
+    if (!PhysiqueControl_Ready())
+    {
+        ImGui::TextWrapped("%s", TR(MSG_PHYSIQUE_UNAVAILABLE));
+        return;
+    }
+    PhysiqueValues values;
+    AppearanceHuman* identity = NULL;
+    bool locked = false;
+    if (!PhysiqueControl_Read(c, &values, &locked, &identity))
+    {
+        ImGui::TextWrapped("%s", TR(MSG_PHYSIQUE_UNSUPPORTED));
+        return;
+    }
+    static AppearanceHuman* previous = NULL;
+    static float draft[3] = { 0 };
+    if (previous != identity)
+    {
+        previous = identity;
+        draft[0] = values.bulk * 100.0f;
+        draft[1] = values.muscle * 100.0f;
+        draft[2] = values.skinny * 100.0f;
+    }
+    ImGui::PushID((const void*)identity);
+    ImGui::TextWrapped("%s", TR(HINT_PHYSIQUE));
+    ImGui::Text("%s %.1f / %.1f / %.1f", TR(LBL_PHYSIQUE_CURRENT),
+        values.bulk * 100.0f, values.muscle * 100.0f, values.skinny * 100.0f);
+    if (ImGui::Button(TR(BTN_CAPTURE_PHYSIQUE)))
+    {
+        draft[0] = values.bulk * 100.0f;
+        draft[1] = values.muscle * 100.0f;
+        draft[2] = values.skinny * 100.0f;
+        SetStatus(PhysiqueControl_Set(c, values, true) ? TR(MSG_PHYSIQUE_QUEUED) : TR(MSG_PHYSIQUE_FAIL));
+    }
+    ImGui::SameLine();
+    bool enabled = locked;
+    if (ImGui::Checkbox(TR(LBL_PHYSIQUE_LOCK), &enabled))
+    {
+        // Enabling freezes the appearance currently shown. Custom draft values
+        // are committed only by Apply, so typing cannot change the character.
+        SetStatus(PhysiqueControl_Set(c, values, enabled) ? TR(MSG_PHYSIQUE_QUEUED) : TR(MSG_PHYSIQUE_FAIL));
+    }
+    ImGui::SetNextItemWidth(NumericInputWidth(260.0f, false));
+    ImGui::SliderFloat(TR(LBL_PHYSIQUE_BULK), &draft[0], 0.0f, 100.0f, "%.1f", ImGuiSliderFlags_AlwaysClamp);
+    ImGui::SetNextItemWidth(NumericInputWidth(260.0f, false));
+    ImGui::SliderFloat(TR(LBL_PHYSIQUE_MUSCLE), &draft[1], 0.0f, 100.0f, "%.1f", ImGuiSliderFlags_AlwaysClamp);
+    ImGui::SetNextItemWidth(NumericInputWidth(260.0f, false));
+    ImGui::SliderFloat(TR(LBL_PHYSIQUE_SKINNY), &draft[2], 0.0f, 100.0f, "%.1f", ImGuiSliderFlags_AlwaysClamp);
+    if (ImGui::Button(TR(BTN_APPLY_PHYSIQUE)))
+    {
+        PhysiqueValues requested = { draft[0] / 100.0f, draft[1] / 100.0f, draft[2] / 100.0f };
+        SetStatus(PhysiqueControl_Set(c, requested, true) ? TR(MSG_PHYSIQUE_QUEUED) : TR(MSG_PHYSIQUE_FAIL));
+    }
+    ImGui::TextWrapped("%s", TR(HINT_PHYSIQUE_SESSION));
+    ImGui::PopID();
+}
+
 static void DrawMedicalTab()
 {
     Character* c = GetSelectedCharacter();
@@ -1210,6 +1658,19 @@ static void DrawMedicalTab()
         ImGui::TextUnformatted(TR(MSG_NO_CHAR));
         return;
     }
+    std::string name;
+    if (SafeGetName(c, &name))
+        ImGui::Text("%s %s", TR(LBL_CHARACTER), name.c_str());
+    if (ImGui::CollapsingHeader(TR(LBL_HEALTH_EDITOR), ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        bool refresh = ImGui::SmallButton(TR(BTN_REFRESH));
+        DrawBloodEditor(c, refresh);
+        DrawPartHealthEditor(c, refresh);
+    }
+    if (ImGui::CollapsingHeader(TR(LBL_PHYSIQUE_EDITOR), ImGuiTreeNodeFlags_DefaultOpen))
+        DrawPhysiqueEditor(c);
+    if (!ImGui::CollapsingHeader(TR(LBL_PROSTHETIC_EDITOR), ImGuiTreeNodeFlags_DefaultOpen))
+        return;
     EnsureLimbCache();
     ImGui::TextUnformatted(TR(HINT_MEDICAL));
     // prosthetic quality / level, same scheme as the armour spawner
@@ -1237,7 +1698,7 @@ static void DrawMedicalTab()
             ImGui::EndCombo();
         }
         ImGui::SameLine();
-        ImGui::PushItemWidth(80.0f);
+        ImGui::PushItemWidth(NumericInputWidth(160.0f, true));
         ImGui::InputInt("##llevel", &g_limbGrade, 1, 10);
         ImGui::PopItemWidth();
         if (g_limbGrade < -1) g_limbGrade = -1;
@@ -1264,25 +1725,38 @@ static void DrawMedicalTab()
 
         if (!g_limbItems.empty())
         {
-            int sel = g_selProsthetic[limb];
-            if (sel < 0 || sel >= (int)g_limbItems.size())
-                sel = 0;
-            const char* preview = g_limbItems[sel]->name.c_str();
-            if (ImGui::BeginCombo("##prost", preview))
+            int first = -1;
+            for (size_t i = 0; i < g_limbItems.size(); ++i)
+                if (IsLimbCompatible(g_limbItems[i], limb)) { first = (int)i; break; }
+            if (first < 0)
             {
-                for (size_t i = 0; i < g_limbItems.size(); ++i)
-                {
-                    int side = -1;
-                    if (GuessLimbSide(g_limbItems[i], &side) && side != limb)
-                        continue;
-                    if (ImGui::Selectable(g_limbItems[i]->name.c_str(), (int)i == sel))
-                        g_selProsthetic[limb] = (int)i;
-                }
-                ImGui::EndCombo();
+                ImGui::TextUnformatted(TR(MSG_NO_COMPATIBLE_LIMB));
             }
-            ImGui::SameLine();
-            if (ImGui::Button(TR(BTN_ATTACH)))
-                DoAttachProsthetic(limb);
+            else
+            {
+                int sel = g_selProsthetic[limb];
+                if (sel < 0 || sel >= (int)g_limbItems.size() ||
+                    !IsLimbCompatible(g_limbItems[sel], limb))
+                {
+                    sel = first;
+                    g_selProsthetic[limb] = sel;
+                }
+                const char* preview = g_limbItems[sel]->name.c_str();
+                if (ImGui::BeginCombo("##prost", preview))
+                {
+                    for (size_t i = 0; i < g_limbItems.size(); ++i)
+                    {
+                        if (!IsLimbCompatible(g_limbItems[i], limb))
+                            continue;
+                        if (ImGui::Selectable(g_limbItems[i]->name.c_str(), (int)i == sel))
+                            g_selProsthetic[limb] = (int)i;
+                    }
+                    ImGui::EndCombo();
+                }
+                ImGui::SameLine();
+                if (ImGui::Button(TR(BTN_ATTACH)))
+                    DoAttachProsthetic(limb);
+            }
         }
         else
         {
@@ -1560,14 +2034,13 @@ static void DrawStatsTab()
     }
 
     // name + money row
-    ImGui::PushItemWidth(200.0f);
+    ImGui::PushItemWidth(280.0f);
     ImGui::InputText(TR(LBL_NAME), g_nameBuf, sizeof(g_nameBuf));
     ImGui::PopItemWidth();
     ImGui::SameLine();
     if (ImGui::Button(TR(BTN_RENAME)))
         DoRename();
-    ImGui::SameLine();
-    ImGui::PushItemWidth(130.0f);
+    ImGui::PushItemWidth(NumericInputWidth(180.0f, false));
     ImGui::InputInt(TR(LBL_MONEY), &g_moneyVal, 0, 0);
     ImGui::PopItemWidth();
     ImGui::SameLine();
@@ -1591,7 +2064,7 @@ static void DrawStatsTab()
         ImGui::PushID(i);
         ImGui::TextUnformatted(TR_STAT(i));
         ImGui::SameLine(200.0f);
-        ImGui::SetNextItemWidth(130.0f);
+        ImGui::SetNextItemWidth(NumericInputWidth(150.0f, false));
         // text edit only; the game is written EXCLUSIVELY by the set button:
         // typing, Enter or clicking away must never apply anything
         ImGui::InputText("##val", g_statEdit[i], sizeof(g_statEdit[i]),
@@ -1706,14 +2179,13 @@ static void DrawItemsTab()
         RefreshVisibleItems("");
 
     // search + category
-    ImGui::PushItemWidth(220.0f);
+    ImGui::PushItemWidth(300.0f);
     if (ImGui::InputText(TR(LBL_SEARCH), g_searchBuf, sizeof(g_searchBuf)))
     {
         std::string f = ToLower(g_searchBuf);
         RefreshVisibleItems(f.c_str());
     }
     ImGui::PopItemWidth();
-    ImGui::SameLine();
     static const char* catNames[6] = {
         TR(CAT_ALL), TR(CAT_WEAPON), TR(CAT_ARMOUR),
         TR(CAT_ITEM), TR(CAT_CROSSBOW), TR(CAT_CONTAINER)
@@ -1790,7 +2262,7 @@ static void DrawItemsTab()
             W_GRADE_NAMES, 5, W_GRADE_LEVELS);
         ImGui::TextUnformatted(TR(LBL_LEVEL_W));
         ImGui::SameLine();
-        ImGui::PushItemWidth(110.0f);
+        ImGui::PushItemWidth(NumericInputWidth(160.0f, true));
         ImGui::InputInt("##wlevel", &g_weaponLevel, 1, 10);
         ImGui::PopItemWidth();
         if (g_weaponLevel < 0) g_weaponLevel = 0;
@@ -1803,14 +2275,14 @@ static void DrawItemsTab()
             A_GRADE_NAMES, 6, A_GRADE_LEVELS);
         ImGui::TextUnformatted(TR(LBL_LEVEL_A));
         ImGui::SameLine();
-        ImGui::PushItemWidth(110.0f);
+        ImGui::PushItemWidth(NumericInputWidth(160.0f, true));
         ImGui::InputInt("##glevel", &g_gearLevel, 1, 10);
         ImGui::PopItemWidth();
         if (g_gearLevel < -1) g_gearLevel = -1;
         if (g_gearLevel > 100) g_gearLevel = 100;
     }
 
-    ImGui::PushItemWidth(90.0f);
+    ImGui::PushItemWidth(NumericInputWidth(160.0f, true));
     ImGui::InputInt(TR(LBL_COUNT), &g_qty, 1, 10);
     ImGui::PopItemWidth();
     if (g_qty < 1) g_qty = 1;
@@ -1823,6 +2295,91 @@ static void DrawItemsTab()
     ImGui::PopStyleColor(2);
     ImGui::TextWrapped("%s", TR(BTN_DRAG_HINT));
     ImGui::EndChild();
+}
+
+// Feature preferences are separate from ImGui's layout file, which ImGui
+// rewrites using only its registered settings handlers.
+static char g_settingsPath[MAX_PATH] = { 0 };
+static int g_settingBuildBypass = 0;
+static bool g_settingsRetryPending = false;
+static DWORD g_settingsLastFailure = 0;
+
+struct TrainerSetting
+{
+    const char* key;
+    int* value;
+    int minimum;
+    int maximum;
+    int saved;
+};
+
+static TrainerSetting g_settings[] =
+{
+    { "BuildBypass", &g_settingBuildBypass, 0, 1, 0 },
+    { "ItemCategory", &g_curCat, 0, 5, 0 },
+    { "SpawnQuantity", &g_qty, 1, 999, 1 },
+    { "WeaponLevel", &g_weaponLevel, 0, 100, 0 },
+    { "GearLevel", &g_gearLevel, -1, 100, -1 },
+    { "ProstheticLevel", &g_limbGrade, -1, 100, -1 },
+    { "XpMultiplierPercent", &g_xpPercent, 0, 100000, 100 },
+    { "XpPlayerFaction", &g_xpPlayer, 0, 1, 1 },
+    { "XpAiFactions", &g_xpAI, 0, 1, 0 }
+};
+
+void Trainer_LoadSettings(const char* directory)
+{
+    if (sprintf_s(g_settingsPath, "%sKenshiTrainer.ini", directory) < 0)
+    {
+        g_settingsPath[0] = 0;
+        DebugLog("KenshiTrainer: feature settings path too long");
+        return;
+    }
+    for (size_t i = 0; i < sizeof(g_settings) / sizeof(g_settings[0]); ++i)
+    {
+        TrainerSetting& setting = g_settings[i];
+        char fallback[16];
+        char text[64];
+        sprintf_s(fallback, "%d", *setting.value);
+        GetPrivateProfileStringA("Features", setting.key, fallback,
+            text, sizeof(text), g_settingsPath);
+        char* end = NULL;
+        long value = strtol(text, &end, 10);
+        if (end != text && *end == '\0' &&
+            value >= setting.minimum && value <= setting.maximum)
+            *setting.value = (int)value;
+        setting.saved = *setting.value;
+    }
+    BuildBypass_Set(g_settingBuildBypass != 0);
+    ExperienceMultiplier_Configure(g_xpPercent, g_xpPlayer != 0, g_xpAI != 0);
+    DebugLog("KenshiTrainer: feature settings loaded (defaults for missing/invalid values)");
+}
+
+static void SaveTrainerSettings()
+{
+    if (!g_settingsPath[0])
+        return;
+    // Retry failed writes without issuing disk IO or log messages every frame.
+    if (g_settingsRetryPending && GetTickCount() - g_settingsLastFailure < 5000)
+        return;
+    g_settingsRetryPending = false;
+    g_settingBuildBypass = BuildBypass_Enabled() ? 1 : 0;
+    for (size_t i = 0; i < sizeof(g_settings) / sizeof(g_settings[0]); ++i)
+    {
+        TrainerSetting& setting = g_settings[i];
+        if (*setting.value == setting.saved)
+            continue;
+        char text[16];
+        sprintf_s(text, "%d", *setting.value);
+        if (!WritePrivateProfileStringA("Features", setting.key, text, g_settingsPath))
+        {
+            g_settingsRetryPending = true;
+            g_settingsLastFailure = GetTickCount();
+            DebugLog("KenshiTrainer: feature settings write failed; retrying in 5 seconds");
+            return;
+        }
+        setting.saved = *setting.value;
+        DebugLog(std::string("KenshiTrainer: saved feature setting ") + setting.key + "=" + text);
+    }
 }
 
 bool Trainer_MenuOpen() { return g_showMenu; }
@@ -1848,13 +2405,12 @@ void DrawTrainerUI()
     }
     __except (EXCEPTION_EXECUTE_HANDLER) {}
 
-    // entry window: anchored top-right of the game viewport; the stale ini
-    // is wiped at boot so FirstUseEver really re-anchors on every launch
+    // Re-anchor once per ImGui context without discarding saved settings.
     {
         ImGuiViewport* vp = ImGui::GetMainViewport();
         ImGui::SetNextWindowPos(
             ImVec2(vp->WorkPos.x + vp->WorkSize.x - 8.0f, vp->WorkPos.y + 8.0f),
-            ImGuiCond_FirstUseEver, ImVec2(1.0f, 0.0f));
+            ImGuiCond_Once, ImVec2(1.0f, 0.0f));
     }
     ImGui::Begin(TR(APP_NAME), NULL,
         ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize |
@@ -1868,10 +2424,13 @@ void DrawTrainerUI()
     ImGui::End();
 
     if (!g_showMenu)
+    {
+        SaveTrainerSettings();
         return;
+    }
 
     ImGui::SetNextWindowSize(ImVec2(620.0f, 520.0f), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowPos(ImVec2(220.0f, 80.0f), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowPos(ImVec2(220.0f, 80.0f), ImGuiCond_Once);
     if (ImGui::Begin(TR(WINDOW_TITLE), &g_showMenu, 0))
     {
         // keep the panel fully inside the viewport (stale coords / res change)
@@ -1912,12 +2471,18 @@ void DrawTrainerUI()
                 DrawMedicalTab();
                 ImGui::EndTabItem();
             }
+            if (ImGui::BeginTabItem(TR(TAB_XP)))
+            {
+                DrawExperienceTab();
+                ImGui::EndTabItem();
+            }
             ImGui::EndTabBar();
         }
         ImGui::Separator();
         ImGui::TextUnformatted(g_status.c_str());
     }
     ImGui::End();
+    SaveTrainerSettings();
 }
 
 // ----------------------------------------------------------------------------
@@ -2037,6 +2602,14 @@ __declspec(dllexport) void startPlugin()
         BuildBypass_Install();
     else
         DebugLog("KenshiTrainer: KT_NOBYPASS set, bypass hooks skipped");
+    if (!GetEnvironmentVariableA("KT_NOXP", NULL, 0))
+        ExperienceMultiplier_Install();
+    else
+        DebugLog("KenshiTrainer: KT_NOXP set, XP hooks skipped");
+    if (!GetEnvironmentVariableA("KT_NOPHYSIQUE", NULL, 0))
+        PhysiqueControl_Install();
+    else
+        DebugLog("KenshiTrainer: KT_NOPHYSIQUE set, physique hooks skipped");
     Overlay_Init();
     DebugLog("KenshiTrainer plugin started");
 }

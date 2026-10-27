@@ -62,6 +62,8 @@
   <ItemGroup>
     <ClCompile Include="KenshiTrainer.cpp" />
     <ClCompile Include="BuildBypass.cpp" />
+    <ClCompile Include="ExperienceMultiplier.cpp" />
+    <ClCompile Include="PhysiqueControl.cpp" />
     <ClCompile Include="Overlay.cpp" />
     <ClCompile Include="..\reference\imgui-1.86\imgui.cpp" />
     <ClCompile Include="..\reference\imgui-1.86\imgui_draw.cpp" />
@@ -72,9 +74,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChineseStrings.h" />
+    <ClInclude Include="ProstheticNames.h" />
     <ClInclude Include="StatNames.h" />
     <ClInclude Include="Overlay.h" />
     <ClInclude Include="BuildBypass.h" />
+    <ClInclude Include="ExperienceMultiplier.h" />
+    <ClInclude Include="PhysiqueControl.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

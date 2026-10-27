@@ -23,7 +23,7 @@ NEW = [
     ("MSG_LIMB_RESTORED", "原生肢体已恢复:", "Restored:"),
     ("MSG_LIMB_FAIL", "肢体操作失败", "Limb operation failed"),
     ("MSG_NO_LIMB_ITEMS", "未找到义肢数据", "No prosthetic items found"),
-    ("HINT_MEDICAL", "提示: 需先截肢才能安装义肢", "Note: sever the limb before attaching a prosthetic"),
+    ("HINT_MEDICAL", "提示: 可直接安装义肢，无需先截肢；替换时旧义肢会放回背包", "Note: install directly without amputation; replaced prosthetics return to the backpack"),
 ]
 
 def esc(s):

@@ -6,6 +6,7 @@ x64/
 *.unsuccessfulbuild
 *.tlog
 logs/
+mods/**/KenshiTrainer.ini
 _replay/
 _replay_*
 _cand_*.txt

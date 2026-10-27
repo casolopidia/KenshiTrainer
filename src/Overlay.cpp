@@ -1015,10 +1015,10 @@ void Overlay_Init()
             if (slash != std::string::npos)
                 p.erase(slash + 1);
             strcpy_s(g_imguiIni, (p + "KenshiTrainer_imgui.ini").c_str());
-            // stale window positions from an older resolution/session must
-            // never resurrect: wipe the ini so every launch re-anchors
-            DeleteFileA(g_imguiIni);
+            // Preserve settings; DrawTrainerUI resets only window positions
+            // once per ImGui context, even when an ini already exists.
             strcpy_s(g_dumpPath, p.c_str());
+            Trainer_LoadSettings(p.c_str());
         }
     }
 
